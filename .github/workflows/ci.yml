@@ -20,6 +20,23 @@ jobs:
         distribution: 'temurin'
         java-version: 17
 
+    - name: Gradle 캐시
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: application.properties 생성
+      run: |
+        mkdir -p src/main/resources
+        echo "$APPLICATION_PROPERTIES" > src/main/resources/application.properties
+      env:
+        APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }}
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
