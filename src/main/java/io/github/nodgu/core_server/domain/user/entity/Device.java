@@ -1,8 +1,12 @@
 package io.github.nodgu.core_server.domain.user.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "devices")
 public class Device {
     
@@ -23,31 +27,6 @@ public class Device {
     // 생성자
     public Device(User user, String fcmToken) {
         this.user = user;
-        this.fcmToken = fcmToken;
-    }
-    
-    // Getter/Setter
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public User getUser() {
-        return user;
-    }
-    
-    public void setUser(User user) {
-        this.user = user;
-    }
-    
-    public String getFcmToken() {
-        return fcmToken;
-    }
-    
-    public void setFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
     }
 } 
