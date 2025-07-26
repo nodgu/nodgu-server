@@ -1,14 +1,16 @@
-import lombok.Getter;
+import lombok.*;
 import io.github.nodgu.core_server.domain.sub.entity.Scrap;
 import io.github.nodgu.core_server.domain.notice.entity.Notice;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
-public class ScrapListViewResponse {
+public class ScrapListResponse {
     private final Long id;
     private final String title;
     private final String content;
 
-    public ScrapListViewResponse(Scrap scrap) {
+    public ScrapListResponse(Scrap scrap) {
         this.id = scrap.getId();
         
         Notice notice = scrap.getNotice();

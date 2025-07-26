@@ -1,6 +1,6 @@
 package io.github.nodgu.core_server.domain.sub.service;
 
-import io.github.nodgu.core_server.domain.sub.dto.AddScrapRequest;
+import io.github.nodgu.core_server.domain.sub.dto.ScrapRequest;
 import io.github.nodgu.core_server.domain.sub.entity.Scrap;
 import io.github.nodgu.core_server.domain.sub.repository.ScrapRepository;
 import io.github.nodgu.core_server.domain.notice.entity.Notice;
@@ -23,7 +23,7 @@ public class ScrapService {
     private final NoticeRepository noticeRepository;
 
     @Transactional // data 변경 시 transaction 내에서 이루어져야 하므로 필요한 annotation
-    public Scrap addScrap(Long user_id, AddScrapRequest request) {
+    public Scrap addScrap(Long user_id, ScrapRequest request) {
         // 현재 로그인한 User 엔티티 조회
         User user = userRepository.findById(user_id)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. ID: " + user_id));
