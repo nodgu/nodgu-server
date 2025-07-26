@@ -49,4 +49,20 @@ public class UserService {
     public boolean validatePassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
+
+    public User updateUser(User user, String nickname, String password) {
+        boolean changed = false;
+        if (nickname != null && !nickname.isBlank()) {
+            user.setNickname(nickname);
+            changed = true;
+        }
+        if (password != null && !password.isBlank()) {
+            user.setPassword(passwordEncoder.encode(password));
+            changed = true;
+        }
+        if (changed) {
+            return userRepository.save(user);
+        }
+        return user;
+    }
 } 
