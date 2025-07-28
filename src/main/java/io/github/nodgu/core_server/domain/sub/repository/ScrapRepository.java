@@ -1,3 +1,5 @@
+package io.github.nodgu.core_server.domain.sub.repository;
+
 import io.github.nodgu.core_server.domain.sub.entity.Scrap;
 import io.github.nodgu.core_server.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

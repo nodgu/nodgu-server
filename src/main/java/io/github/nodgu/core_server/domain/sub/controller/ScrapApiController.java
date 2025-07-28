@@ -1,3 +1,5 @@
+package io.github.nodgu.core_server.domain.sub.controller;
+
 import lombok.RequiredArgsConstructor;
 import io.github.nodgu.core_server.domain.sub.entity.Scrap;
 import io.github.nodgu.core_server.domain.sub.dto.ScrapRequest;
@@ -21,8 +23,8 @@ public class ScrapApiController {
     @GetMapping("myScrap")
     // @AuthenticationPrincipal User user: Spring Security가 현재 로그인한 User 객체를 주입해줍니다.
     // user.getId()를 호출하여 사용자의 ID를 서비스 계층으로 넘깁니다.
-    public ResponseEntity<List<ScrapListResponse>> findAllMyScraps(@AuthenticationPrincipal User user) {
-        List<ScrapListResponse> scraps = scrapService.findAllScrapsByUser(user.getId())
+    public ResponseEntity<List<ScrapListResponse>> findAllScraps(@AuthenticationPrincipal User user) {
+        List<ScrapListResponse> scraps = scrapService.findAllScraps(user.getId())
                 .stream()
                 .map(ScrapListResponse::new)
                 .toList();

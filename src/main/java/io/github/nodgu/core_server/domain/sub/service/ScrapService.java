@@ -9,9 +9,8 @@ import io.github.nodgu.core_server.domain.user.entity.User;
 import io.github.nodgu.core_server.domain.user.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -22,7 +21,7 @@ public class ScrapService {
     private final UserRepository userRepository;
     private final NoticeRepository noticeRepository;
 
-    @Transactional // data 변경 시 transaction 내에서 이루어져야 하므로 필요한 annotation
+    @Transactional // data 변경 시 transaction 내에서 이루어져야 해서 필요한 annotation
     public Scrap addScrap(Long user_id, ScrapRequest request) {
         // 현재 로그인한 User 엔티티 조회
         User user = userRepository.findById(user_id)

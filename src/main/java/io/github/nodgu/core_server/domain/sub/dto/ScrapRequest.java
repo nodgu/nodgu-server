@@ -1,3 +1,6 @@
+package io.github.nodgu.core_server.domain.sub.dto;
+
+import io.github.nodgu.core_server.domain.sub.entity.Scrap;
 import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED) //기본 생성자 추가
@@ -5,4 +8,8 @@ import lombok.*;
 @Getter
 public class ScrapRequest {
     private Long notice_id;
+
+    public Scrap toEntity() {
+        return Scrap.builder().notice_id(notice_id).build();
+    }
 }
