@@ -3,12 +3,12 @@ package io.github.nodgu.core_server.domain.notification.controller;
 import lombok.RequiredArgsConstructor;
 import io.github.nodgu.core_server.domain.notification.entity.Notification;
 import io.github.nodgu.core_server.domain.notification.dto.NotificationRequest;
-import io.github.nodgu.core_server.domain.notification.dto.NotificationResponse;
+import io.github.nodgu.core_server.domain.notification.dto.NotificationListResponse;
 import io.github.nodgu.core_server.domain.notification.service.NotificationService;
 import io.github.nodgu.core_server.domain.user.entity.User;
+import io.github.nodgu.core_server.global.annotation.CurrentUser;
 
 import org.springframework.http.*;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,31 +21,29 @@ public class NotificationApiController {
 
     private final NotificationService notificationService;
     @GetMapping("/myNotification")
-    public ResponseEntity<List<NotificationResponse>> findAllNotifications(
-            @AuthenticationPrincipal User user) {
-        List<NotificationResponse> notifications = notificationService.findAllNotifications(user.getId())
+    public ResponseEntity<List<NotificationListResponse>> findAllNotifications(
+            @CurrentUser User user) {
+        List<NotificationListResponse> notifications = notificationService.findAllNotifications(user)
                 .stream()
-                .map(NotificationResponse::new)
+                .map(NotificationListResponse::new)
                 .collect(Collectors.toList());
         return ResponseEntity.ok()
                 .body(notifications);
     }
 
     @PostMapping("/myNotification")
-    public ResponseEntity<NotificationResponse> addNotification(
+    public ResponseEntity<NotificationListResponse> addNotification(
             @RequestBody NotificationRequest request,
-            @AuthenticationPrincipal User user) {
+            @CurrentUser User user) {
 
-        Notification savedNotification = notificationService.addNotification(user.getId(), request);
+        Notification savedNotification = notificationService.addNotification(request, user);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new NotificationResponse(savedNotification));
+                .body(new NotificationListResponse(savedNotification));
     }
 
     @DeleteMapping("/myNotification/{id}")
-    public ResponseEntity<Void> deleteNotification(
-            @PathVariable("id") Long id,
-            @AuthenticationPrincipal User user) {
-        notificationService.deleteNotification(id, user.getId());
+    public ResponseEntity<Void> deleteNotification(@PathVariable("id") Long id, @CurrentUser User user) {
+        notificationService.deleteNotification(id, user);
         return ResponseEntity.ok()
                 .build();
     }

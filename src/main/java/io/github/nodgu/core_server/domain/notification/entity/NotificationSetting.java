@@ -1,16 +1,14 @@
 package io.github.nodgu.core_server.domain.notification.entity;
 
 import io.github.nodgu.core_server.domain.user.entity.User;
+import io.github.nodgu.core_server.domain.sub.entity.Keyword;
+import io.github.nodgu.core_server.domain.sub.entity.Keyword;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "notification_setting")
 public class NotificationSetting {
@@ -21,29 +19,29 @@ public class NotificationSetting {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "keyword", nullable = false)
-    private String keyword;
+    @JoinColumn(name = "keyword", nullable = false)
+    private Keyword keyword;
 
     @Column(name = "title")
     private String title;
 
     @Column(name = "alarm_days")
-    private int alarm_days;
+    private Integer alarmDays;
 
     @Column(name = "alarm_time")
-    private LocalDateTime alarm_time;
+    private String alarmTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Builder
-    public NotificationSetting(String keyword, String title, int alarm_days, LocalDateTime alarm_time, User user) {
+    public NotificationSetting(Keyword keyword, String title, Integer alarmDays, String alarmTime, User user) {
         this.keyword = keyword;
-        if (title == null || title.trim().isEmpty()) this.title = keyword; //기본값 keyword
+        if (title == null || title.trim().isEmpty()) this.title = keyword.getTitle(); //기본값 keyword
         else this.title = title;
-        this.alarm_days = alarm_days;
-        this.alarm_time = alarm_time;
+        this.alarmDays = alarmDays;
+        this.alarmTime = alarmTime;
         this.user = user;
     }
 }

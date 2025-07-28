@@ -8,8 +8,8 @@ import io.github.nodgu.core_server.domain.notification.service.NotificationSetti
 import io.github.nodgu.core_server.domain.user.entity.User;
 
 import org.springframework.http.*;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import io.github.nodgu.core_server.global.annotation.CurrentUser;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,9 +24,9 @@ public class NotificationSettingApiController {
     @PostMapping
     public ResponseEntity<NotificationSettingResponse> addNotificationSetting(
             @RequestBody NotificationSettingRequest request,
-            @AuthenticationPrincipal User user) {
+            @CurrentUser User user) {
 
-        NotificationSetting savedSetting = notificationSettingService.addNotificationSetting(user.getId(), request);
+        NotificationSetting savedSetting = notificationSettingService.addNotificationSetting(request, user);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new NotificationSettingResponse(savedSetting));
@@ -34,9 +34,9 @@ public class NotificationSettingApiController {
 
     @GetMapping("/myNotificationSetting")
     public ResponseEntity<List<NotificationSettingResponse>> findAllNotificationSettings(
-            @AuthenticationPrincipal User user) {
+            @CurrentUser User user) {
 
-        List<NotificationSettingResponse> settings = notificationSettingService.findAllNotificationSettings(user.getId())
+        List<NotificationSettingResponse> settings = notificationSettingService.findAllNotificationSettings(user)
                 .stream()
                 .map(NotificationSettingResponse::new)
                 .collect(Collectors.toList());
@@ -48,13 +48,9 @@ public class NotificationSettingApiController {
     @GetMapping("/myNotificationSetting/{id}")
     public ResponseEntity<NotificationSettingResponse> getNotificationSetting(
             @PathVariable("id") Long id,
-            @AuthenticationPrincipal User user) {
+            @CurrentUser User user) {
 
-        NotificationSetting setting = notificationSettingService.findById(id);
-
-        if (!setting.getUser().getId().equals(user.getId())) {
-            throw new org.springframework.security.access.AccessDeniedException("접근 권한이 없습니다.");
-        }
+        NotificationSetting setting = notificationSettingService.findById(id, user);
 
         return ResponseEntity.ok()
                 .body(new NotificationSettingResponse(setting));
@@ -64,9 +60,9 @@ public class NotificationSettingApiController {
     public ResponseEntity<NotificationSettingResponse> updateNotificationSetting(
             @PathVariable("id") Long id,
             @RequestBody NotificationSettingRequest request,
-            @AuthenticationPrincipal User user) {
+            @CurrentUser User user) {
 
-        NotificationSetting updatedSetting = notificationSettingService.updateNotificationSetting(id, user.getId(), request);
+        NotificationSetting updatedSetting = notificationSettingService.updateNotificationSetting(id, request, user);
 
         return ResponseEntity.ok()
                 .body(new NotificationSettingResponse(updatedSetting));
@@ -75,9 +71,9 @@ public class NotificationSettingApiController {
     @DeleteMapping("/myNotificationSetting/{id}")
     public ResponseEntity<Void> deleteNotificationSetting(
             @PathVariable("id") Long id,
-            @AuthenticationPrincipal User user) {
+            @CurrentUser User user) {
 
-        notificationSettingService.deleteNotificationSetting(id, user.getId());
+        notificationSettingService.deleteNotificationSetting(id, user);
 
         return ResponseEntity.ok()
                 .build();

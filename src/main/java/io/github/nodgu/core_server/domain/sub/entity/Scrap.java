@@ -1,15 +1,16 @@
 package io.github.nodgu.core_server.domain.sub.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Builder;
+import lombok.*;
+
+import io.github.nodgu.core_server.domain.user.entity.User;
+import io.github.nodgu.core_server.domain.notice.entity.Notice;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "scraps")
+// @Table(name = "scraps")
 public class Scrap {
 
     @Id
@@ -18,15 +19,15 @@ public class Scrap {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user")
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "notice")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "notice_id")
     private Notice notice;
 
     @Builder
-    public Scrap(User user, Notice notice) {
+    public Scrap(Notice notice, User user) {
         this.user = user;
         this.notice = notice;
     }

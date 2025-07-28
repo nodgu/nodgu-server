@@ -8,15 +8,13 @@ import io.github.nodgu.core_server.domain.notice.entity.Notice;
 @AllArgsConstructor
 @Getter
 public class ScrapListResponse {
-    private final Long id;
-    private final String title;
-    private final Long description;
+    private Long id;
+    private String title;
+    private String description;
 
-    public Scrap toEntity() {
-        return Scrap.builder()
-            .id(id)
-            .title(title)
-            .description(description)
-            .build();
+    public ScrapListResponse(Scrap scrap) {
+        this.id = scrap.getId();
+        this.title = scrap.getNotice().getTitle();
+        this.description = scrap.getNotice().getDescription();
     }
 }
