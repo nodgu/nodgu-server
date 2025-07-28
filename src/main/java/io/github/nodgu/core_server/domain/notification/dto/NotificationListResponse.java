@@ -1,0 +1,24 @@
+package io.github.nodgu.core_server.domain.notification.dto;
+
+import lombok.*;
+import io.github.nodgu.core_server.domain.notice.entity.Notice;
+import io.github.nodgu.core_server.domain.notification.entity.Notification;
+import io.github.nodgu.core_server.domain.notification.entity.NotificationSetting;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+public class NotificationListResponse {
+    private final Long id;
+    private final String title;
+    private final Long description;
+    private final Notice notice;
+
+    public NotificationListResponse(Notification notification) {
+        this.id = notification.getId();
+        
+        this.notice = notification.getNotice();
+        this.title = this.notice.getTitle();
+        this.description = this.notice.getDescription();
+    }
+}
