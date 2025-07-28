@@ -1,11 +1,13 @@
 package io.github.nodgu.core_server.domain.user.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "users")
 public class User {
     
@@ -59,78 +61,5 @@ public class User {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-    
-    // Getter/Setter
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public String getEmail() {
-        return email;
-    }
-    
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    
-    public String getPassword() {
-        return password;
-    }
-    
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    
-    public String getNickname() {
-        return nickname;
-    }
-    
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-    
-    public Boolean getIsSuperuser() {
-        return isSuperuser;
-    }
-    
-    public void setIsSuperuser(Boolean isSuperuser) {
-        this.isSuperuser = isSuperuser;
-    }
-    
-    public Boolean getIsActive() {
-        return isActive;
-    }
-    
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
-    
-    public Boolean getIsStaff() {
-        return isStaff;
-    }
-    
-    public void setIsStaff(Boolean isStaff) {
-        this.isStaff = isStaff;
-    }
-    
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-    
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-    
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-    
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 } 
