@@ -23,4 +23,12 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
                                           Pageable pageable);
 
     Optional<Notice> findByNoticeId(String noticeId);
+
+    boolean existsByUnivCodeAndOrgCodeAndSubCodeAndTdindex(
+        String univCode,
+        String orgCode,
+        String subCode,
+        String tdindex
+    );
 }
+

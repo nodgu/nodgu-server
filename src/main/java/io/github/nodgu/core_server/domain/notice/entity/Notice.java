@@ -8,7 +8,10 @@ import org.hibernate.type.SqlTypes;
 import io.github.nodgu.core_server.domain.sub.entity.Keyword;
 
 @Entity
-@Table(name = "NOTICE")
+@Table(
+    name = "NOTICE",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"univCode", "orgCode", "subCode", "noticeId"})
+)
 public class Notice {
 
     @Id
@@ -27,7 +30,7 @@ public class Notice {
     @Lob
     private String description;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String noticeId;
 
     @Column(nullable = false, updatable = false)

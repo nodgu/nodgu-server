@@ -68,13 +68,16 @@ public class NoticeController {
     }
 
     @PostMapping("/notice")
-    public ResponseEntity<ApiResponse<String>> createNotice (@RequestBody NoticeRequest noticeRequest) {
+    public ResponseEntity<ApiResponse<String>> createNotice(@RequestBody NoticeRequest noticeRequest) {
         try {
             noticeService.createNotice(noticeRequest);
             return ResponseEntity.ok(ApiResponse.success("공지사항이 성공적으로 생성되었습니다"));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(409)
+                    .body(ApiResponse.error("공지사항이 이미 존재합니다: " + e.getMessage(), 409));
         } catch (Exception e) {
             return ResponseEntity.status(500)
-                    .body(ApiResponse.error("공지사항 생성에 실패했습니다" + e.getMessage(), 500));
+                    .body(ApiResponse.error("공지사항 생성에 실패했습니다: " + e.getMessage(), 500));
         }
     }
 

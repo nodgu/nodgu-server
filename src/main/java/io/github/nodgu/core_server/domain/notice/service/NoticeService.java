@@ -27,6 +27,19 @@ public class NoticeService {
     }
 
     public void createNotice(NoticeRequest request) {
+        String tdindex = request.getTdindex();
+
+        boolean exists = noticeRepository.existsByUnivCodeAndOrgCodeAndSubCodeAndTdindex(
+            request.getUnivCode(),
+            request.getOrgCode(),
+            request.getSubCode(),
+            tdindex
+        );
+
+        if (exists) {
+            throw new IllegalStateException("이미 동일한 공지사항이 존재합니다.");
+        }
+
         Notice notice = new Notice(
             request.getNoticeId(),
             request.getTitle(),
@@ -34,7 +47,7 @@ public class NoticeService {
             request.getDescription(),
             request.getNotitype(),
             request.getDate(),
-            request.getTdindex(),
+            tdindex,
             request.getImgs(),
             request.getLinks(),
             request.getAttachments(),
