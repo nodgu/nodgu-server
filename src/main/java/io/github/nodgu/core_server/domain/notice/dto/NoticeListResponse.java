@@ -34,15 +34,17 @@ public class NoticeListResponse {
         private Long id;
         private String noticeId;
         private String title;
+        private String description;
         private String url;
         private String notitype;
         private LocalDateTime date;
         private List<String> keywords;
 
-        public NoticeDto(Long id, String noticeId, String title, String url, String notitype, LocalDateTime date, List<String> keywords) {
+        public NoticeDto(Long id, String noticeId, String title, String description, String url, String notitype, LocalDateTime date, List<String> keywords) {
             this.id = id;
             this.noticeId = noticeId;
             this.title = title;
+            this.description = description;
             this.url = url;
             this.notitype = notitype;
             this.date = date;
@@ -58,6 +60,7 @@ public class NoticeListResponse {
                 notice.getId(),
                 notice.getNoticeId(),
                 notice.getTitle(),
+                notice.getDescription(),
                 notice.getUrl(),
                 notice.getNotitype(),
                 notice.getDate(),
@@ -68,6 +71,7 @@ public class NoticeListResponse {
         public Long getId() { return id; }
         public String getNoticeId() { return noticeId; }
         public String getTitle() { return title; }
+        public String getDescription() {return description; }
         public String getUrl() { return url; }
         public String getNotitype() { return notitype; }
         public LocalDateTime getDate() { return date; }
