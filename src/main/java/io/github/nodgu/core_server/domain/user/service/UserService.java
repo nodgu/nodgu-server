@@ -1,6 +1,8 @@
 package io.github.nodgu.core_server.domain.user.service;
 
+import io.github.nodgu.core_server.domain.user.entity.Device;
 import io.github.nodgu.core_server.domain.user.entity.User;
+import io.github.nodgu.core_server.domain.user.repository.DeviceRepository;
 import io.github.nodgu.core_server.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,11 +15,13 @@ public class UserService {
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    
+    private final DeviceRepository deviceRepository;
+
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, DeviceRepository deviceRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.deviceRepository = deviceRepository;
     }
     
     public User createUser(String email, String password, String nickname) {
@@ -48,5 +52,30 @@ public class UserService {
     
     public boolean validatePassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    public User updateUser(User user, String nickname, String password) {
+        boolean changed = false;
+        if (nickname != null && !nickname.isBlank()) {
+            user.setNickname(nickname);
+            changed = true;
+        }
+        if (password != null && !password.isBlank()) {
+            user.setPassword(passwordEncoder.encode(password));
+            changed = true;
+        }
+        if (changed) {
+            return userRepository.save(user);
+        }
+        return user;
+    }
+
+    public Device registerDevice(User user, String fcmToken) {
+        Device device = new Device(user, fcmToken);
+        return deviceRepository.save(device);
+    }
+
+    public void unregisterDevice(User user, String fcmToken) {
+        deviceRepository.deleteByUserAndFcmToken(user, fcmToken);
     }
 } 
