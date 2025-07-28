@@ -10,6 +10,8 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class CurrentUserResolver implements HandlerMethodArgumentResolver {
@@ -32,6 +34,7 @@ public class CurrentUserResolver implements HandlerMethodArgumentResolver {
             return authentication.getPrincipal();
         }
         
-        return null;
+        // 인증되지 않은 사용자일 때 401 에러 반환
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다");
     }
 } 
