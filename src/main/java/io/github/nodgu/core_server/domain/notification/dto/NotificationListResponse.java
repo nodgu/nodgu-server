@@ -9,14 +9,13 @@ import io.github.nodgu.core_server.domain.notification.entity.NotificationSettin
 @AllArgsConstructor
 @Getter
 public class NotificationListResponse {
-    private final Long id;
-    private final String title;
-    private final Long description;
-    private final Notice notice;
+    private Long id;
+    private String title;
+    private String description;
+    private Notice notice;
 
     public NotificationListResponse(Notification notification) {
         this.id = notification.getId();
-        
         this.notice = notification.getNotice();
         this.title = this.notice.getTitle();
         this.description = this.notice.getDescription();
