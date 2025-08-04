@@ -33,7 +33,7 @@ public class Notice {
     @Column(nullable = false)
     private String notitype;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
@@ -42,7 +42,7 @@ public class Notice {
     @Column(nullable = false, updatable = false)
     private LocalDateTime date;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String tdindex;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -54,7 +54,7 @@ public class Notice {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Map<String, Object>> attachments;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String ocrData;
 
     @Column(nullable = false)
