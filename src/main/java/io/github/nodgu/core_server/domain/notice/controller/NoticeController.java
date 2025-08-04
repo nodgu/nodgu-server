@@ -7,6 +7,9 @@ import io.github.nodgu.core_server.domain.notice.entity.Notice;
 import io.github.nodgu.core_server.domain.notice.service.NoticeService;
 import io.github.nodgu.core_server.global.dto.ApiResponse;
 import io.github.nodgu.core_server.global.util.JwtUtil;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -81,4 +84,21 @@ public class NoticeController {
         }
     }
 
+    @PatchMapping("/notice/{id}")
+    public ResponseEntity<ApiResponse<String>> updateNotice(@PathVariable("id") Long id, @RequestBody NoticeRequest noticeRequest) {
+        noticeService.updateNotice(id, noticeRequest);
+        return ResponseEntity.ok(ApiResponse.success("공지사항이 성공적으로 수정되었습니다"));
+    }
+
+    @GetMapping("/notice/noOcrData")
+    public ResponseEntity<ApiResponse<List<Notice>>> getNoticeNoOcrData() {
+        List<Notice> noticeList = noticeService.getNoticeNoOcrData();
+        return ResponseEntity.ok(ApiResponse.success(noticeList));
+    }
+
+    @PatchMapping("/notice/addOcrData/{id}")
+    public ResponseEntity<ApiResponse<String>> addOcrData(@PathVariable("id") Long id, @RequestBody String ocrData) {
+        noticeService.addOcrData(id, ocrData);
+        return ResponseEntity.ok(ApiResponse.success("공지사항의 ocr 데이터가 성공적으로 추가되었습니다"));
+    }
 }

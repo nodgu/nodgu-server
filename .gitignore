@@ -51,3 +51,4 @@ application-test.properties
 .DS_Store
 
 API_명세서
+.cursorignore
