@@ -3,9 +3,12 @@ package io.github.nodgu.core_server.domain.notice.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+
+import io.github.nodgu.core_server.domain.notice.dto.NoticeRequest;
 import io.github.nodgu.core_server.domain.sub.entity.Keyword;
 
 @Entity
@@ -30,7 +33,7 @@ public class Notice {
     @Column(nullable = false)
     private String notitype;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
@@ -39,7 +42,7 @@ public class Notice {
     @Column(nullable = false, updatable = false)
     private LocalDateTime date;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String tdindex;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -51,7 +54,7 @@ public class Notice {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Map<String, Object>> attachments;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String ocrData;
 
     @Column(nullable = false)
@@ -101,5 +104,20 @@ public class Notice {
         this.univCode = univCode;
         this.orgCode = orgCode;
         this.subCode = subCode;
+    }
+
+    public void update(NoticeRequest request) {
+        this.title = request.getTitle();
+        this.description = request.getDescription();
+        this.notitype = request.getNotitype();
+        this.date = request.getDate();
+        this.tdindex = request.getTdindex();
+        this.imgs = request.getImgs();
+        this.links = request.getLinks();
+        this.attachments = request.getAttachments();
+        this.ocrData = request.getOcrData();
+        this.univCode = request.getUnivCode();
+        this.orgCode = request.getOrgCode();
+        this.subCode = request.getSubCode();
     }
 }

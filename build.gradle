@@ -6,6 +6,7 @@ plugins {
 
 group = 'io.github.nodgu'
 version = '0.0.1-SNAPSHOT'
+archivesBaseName = 'core-server'
 
 java {
 	toolchain {
@@ -38,6 +39,7 @@ dependencies {
 	
 	// Migration
 	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-database-postgresql'
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'

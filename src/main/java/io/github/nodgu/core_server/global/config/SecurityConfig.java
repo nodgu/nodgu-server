@@ -5,6 +5,7 @@ import io.github.nodgu.core_server.global.security.JwtAuthenticationFilter;
 import io.github.nodgu.core_server.global.util.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,7 +24,7 @@ public class SecurityConfig {
     }
     
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtil jwtUtil, UserService userService) {
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtil jwtUtil, @Lazy UserService userService) {
         return new JwtAuthenticationFilter(jwtUtil, userService);
     }
     

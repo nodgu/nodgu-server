@@ -93,4 +93,22 @@ public class NoticeService {
 
         return NoticeListResponse.from(notices, totalCount, pageNum);
     }
+
+    public void updateNotice(Long id, NoticeRequest request) {
+        Notice notice = noticeRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("해당 공지를 찾을 수 없습니다"));
+        notice.update(request);
+        noticeRepository.save(notice);
+    }
+
+    public List<Notice> getNoticeNoOcrData() {
+        return noticeRepository.findByOcrDataIsNull();
+    }
+
+    public void addOcrData(Long id, String ocrData) {
+        Notice notice = noticeRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("해당 공지를 찾을 수 없습니다"));
+        notice.setOcrData(ocrData);
+        noticeRepository.save(notice);
+    }
 }
