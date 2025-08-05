@@ -32,6 +32,11 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
         String tdindex
     );
 
+    // OCR 데이터가 null이거나 빈 문자열인 공지사항 조회
+    @Query("SELECT n FROM Notice n WHERE n.ocrData IS NULL OR n.ocrData = '' OR n.ocrData = ' ' OR TRIM(n.ocrData) = ''")
+    List<Notice> findByOcrDataNullOrEmpty();
+
+    // 기존 메서드 (하위 호환성을 위해 유지)
     List<Notice> findByOcrDataIsNull();
 }
 
