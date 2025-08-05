@@ -12,14 +12,14 @@ import io.github.nodgu.core_server.domain.sub.entity.Keyword;
 public class NotificationSettingResponse {
     private Long id;
     private String title;
-    private Keyword keyword;
+    private String keywordTitle;
     private Integer alarmDays;
     private String alarmTime;
 
     public NotificationSettingResponse(NotificationSetting notificationSetting) {
         this.id = notificationSetting.getId();
         this.title = notificationSetting.getTitle();
-        this.keyword = notificationSetting.getKeyword();
+        this.keywordTitle = notificationSetting.getKeyword().getTitle();
         this.alarmDays = notificationSetting.getAlarmDays();
         this.alarmTime = notificationSetting.getAlarmTime();
     }
