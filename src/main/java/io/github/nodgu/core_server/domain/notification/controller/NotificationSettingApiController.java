@@ -6,6 +6,7 @@ import io.github.nodgu.core_server.domain.notification.dto.NotificationSettingRe
 import io.github.nodgu.core_server.domain.notification.entity.NotificationSetting;
 import io.github.nodgu.core_server.domain.notification.service.NotificationSettingService;
 import io.github.nodgu.core_server.domain.user.entity.User;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,7 @@ public class NotificationSettingApiController {
                 .body(new NotificationSettingResponse(savedSetting));
     }
 
-    @GetMapping("/myNotificationSetting")
+    @GetMapping
     public ResponseEntity<List<NotificationSettingResponse>> findAllNotificationSettings(
             @CurrentUser User user) {
 
@@ -45,7 +46,7 @@ public class NotificationSettingApiController {
                 .body(settings);
     }
 
-    @GetMapping("/myNotificationSetting/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<NotificationSettingResponse> getNotificationSetting(
             @PathVariable("id") Long id,
             @CurrentUser User user) {
@@ -56,7 +57,7 @@ public class NotificationSettingApiController {
                 .body(new NotificationSettingResponse(setting));
     }
 
-    @PatchMapping("/myNotificationSetting/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<NotificationSettingResponse> updateNotificationSetting(
             @PathVariable("id") Long id,
             @RequestBody NotificationSettingRequest request,
@@ -68,7 +69,7 @@ public class NotificationSettingApiController {
                 .body(new NotificationSettingResponse(updatedSetting));
     }
 
-    @DeleteMapping("/myNotificationSetting/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNotificationSetting(
             @PathVariable("id") Long id,
             @CurrentUser User user) {

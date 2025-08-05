@@ -13,11 +13,13 @@ public class NotificationListResponse {
     private String title;
     private String description;
     private Notice notice;
+    private Long notificationSettingId;
 
     public NotificationListResponse(Notification notification) {
         this.id = notification.getId();
         this.notice = notification.getNotice();
-        this.title = this.notice.getTitle();
-        this.description = this.notice.getDescription();
+        this.title = notification.getTitle();
+        this.description = notification.getDescription();
+        this.notificationSettingId = notification.getNotificationSetting().getId();
     }
 }

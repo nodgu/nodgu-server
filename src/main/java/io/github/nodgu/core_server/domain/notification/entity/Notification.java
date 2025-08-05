@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 @Table(name = "notifications")
 public class Notification {
 
@@ -20,9 +22,9 @@ public class Notification {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "keyword", nullable = false)
-    private Keyword keyword;
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "keyword", nullable = false)
+    // private Keyword keyword;
 
     @Column(name = "title")
     private String title;
@@ -47,8 +49,7 @@ public class Notification {
     private NotificationSetting notificationSetting; // 이거 추가함에 따라 노션 DB Schema 수정했으니 검토 필요
 
     @Builder
-    public Notification(Keyword keyword, String title, String description, LocalDateTime remindDate, User user, Notice notice, NotificationSetting notificationSetting) {
-        this.keyword = keyword;
+    public Notification(String title, String description, LocalDateTime remindDate, User user, Notice notice, NotificationSetting notificationSetting) {
         this.title = title;
         this.description = description;
         this.remindDate = remindDate;
