@@ -6,6 +6,7 @@ plugins {
 
 group = 'io.github.nodgu'
 version = '0.0.1-SNAPSHOT'
+archivesBaseName = 'core-server'
 
 java {
 	toolchain {
@@ -22,6 +23,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// Documentation - SpringDoc OpenAPI
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
 	
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
@@ -38,6 +42,7 @@ dependencies {
 	
 	// Migration
 	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-database-postgresql'
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'

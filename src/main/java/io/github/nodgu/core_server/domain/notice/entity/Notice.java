@@ -3,11 +3,17 @@ package io.github.nodgu.core_server.domain.notice.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+
+import io.github.nodgu.core_server.domain.notice.dto.NoticeRequest;
 import io.github.nodgu.core_server.domain.sub.entity.Keyword;
 
 @Entity
+@Getter
+@Setter
 @Table(
     name = "NOTICE",
     uniqueConstraints = @UniqueConstraint(columnNames = {"univCode", "orgCode", "subCode", "noticeId"})
@@ -27,7 +33,7 @@ public class Notice {
     @Column(nullable = false)
     private String notitype;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
@@ -36,7 +42,7 @@ public class Notice {
     @Column(nullable = false, updatable = false)
     private LocalDateTime date;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String tdindex;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -48,7 +54,7 @@ public class Notice {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Map<String, Object>> attachments;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String ocrData;
 
     @Column(nullable = false)
@@ -100,120 +106,18 @@ public class Notice {
         this.subCode = subCode;
     }
 
-    // Getter/Setter
-    public Long getId() {
-        return id;
-    }
-
-    public String getNoticeId() {
-        return noticeId;
-    }
-
-    public void setNoticeId(String noticeId) {
-        this.noticeId = noticeId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getNotitype() {
-        return notitype;
-    }
-
-    public void setNotitype(String notitype) {
-        this.notitype = notitype;
-    }
-
-    public LocalDateTime getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDefinition(String description) {
-        this.description = description;
-    }
-
-    public String getTdindex() {
-        return tdindex;
-    }
-
-    public void setTdindex(String tdindex) {
-        this.tdindex = tdindex;
-    }
-
-    public List<String> getImgs() {
-        return imgs;
-    }
-
-    public void setImgs(List<String> imgs) {
-        this.imgs = imgs;
-    }
-
-    public List<String> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<String> links) {
-        this.links = links;
-    }
-
-    public List<Map<String, Object>> getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(List<Map<String, Object>> attachments) {
-        this.attachments = attachments;
-    }
-
-    public String getOcrData() {
-        return ocrData;
-    }
-
-    public void setOcrData(String ocrData) {
-        this.ocrData = ocrData;
-    }
-
-    public String getUnivCode() {
-        return univCode;
-    }
-
-    public void setUnivCode(String univCode) {
-        this.univCode = univCode;
-    }
-
-    public String getOrgCode() {
-        return orgCode;
-    }
-
-    public void setOrgCode(String orgCode) {
-        this.orgCode = orgCode;
-    }
-
-    public String getSubCode() {
-        return subCode;
-    }
-
-    public void setSubCode(String subCode) {
-        this.subCode = subCode;
+    public void update(NoticeRequest request) {
+        this.title = request.getTitle();
+        this.description = request.getDescription();
+        this.notitype = request.getNotitype();
+        this.date = request.getDate();
+        this.tdindex = request.getTdindex();
+        this.imgs = request.getImgs();
+        this.links = request.getLinks();
+        this.attachments = request.getAttachments();
+        this.ocrData = request.getOcrData();
+        this.univCode = request.getUnivCode();
+        this.orgCode = request.getOrgCode();
+        this.subCode = request.getSubCode();
     }
 }
