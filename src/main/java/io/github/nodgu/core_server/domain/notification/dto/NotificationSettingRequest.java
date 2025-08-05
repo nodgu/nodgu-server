@@ -11,9 +11,13 @@ import io.github.nodgu.core_server.domain.sub.entity.Keyword;
 @Setter
 public class NotificationSettingRequest {
     private String title; // 설정된 알림 제목
-    private Keyword keyword;
+
+    @JsonProperty("keyword_id")
+    private Long keywordId;
+    
+    @JsonProperty("alarm_days")
     private Integer alarmDays;
 
-    @JsonProperty("alarmTime")
+    @JsonProperty("alarm_time")
     private String alarmTime;
 }

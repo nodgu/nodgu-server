@@ -18,8 +18,8 @@ public class NotificationSetting {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "keyword", nullable = false)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "keyword_id", nullable = false)
     private Keyword keyword;
 
     @Column(name = "title")

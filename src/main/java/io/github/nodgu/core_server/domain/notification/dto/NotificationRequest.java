@@ -15,7 +15,9 @@ import java.time.LocalDateTime;
 public class NotificationRequest {
     private String title;
     private String description;
-    private Keyword keyword;
+
+    @JsonProperty("notification_setting_id")
+    private Long notificationSettingId;
 
     @JsonProperty("remind_date")
     private LocalDateTime remindDate;
