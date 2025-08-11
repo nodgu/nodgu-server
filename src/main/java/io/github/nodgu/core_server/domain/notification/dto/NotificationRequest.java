@@ -1,10 +1,6 @@
 package io.github.nodgu.core_server.domain.notification.dto;
 
 import lombok.*;
-import io.github.nodgu.core_server.domain.notification.entity.Notification;
-import io.github.nodgu.core_server.domain.notification.entity.NotificationSetting;
-import io.github.nodgu.core_server.domain.notice.entity.Notice;
-import io.github.nodgu.core_server.domain.sub.entity.Keyword;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
@@ -18,6 +14,9 @@ public class NotificationRequest {
 
     @JsonProperty("notification_setting_id")
     private Long notificationSettingId;
+
+    @JsonProperty("notice_id")
+    private Long noticeId = null;
 
     @JsonProperty("remind_date")
     private LocalDateTime remindDate;

@@ -40,7 +40,7 @@ public class Notification {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "notice_id")
+    @JoinColumn(name = "notice_id", nullable = true)
     private Notice notice;
 
     // 어떤 notificationSetting에서 왔는지 알아야 할 것 같아서 추가했음
