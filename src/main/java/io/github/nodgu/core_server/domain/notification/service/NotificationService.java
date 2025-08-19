@@ -28,7 +28,10 @@ public class NotificationService {
     private final FcmPushService fcmPushService;
     private final DeviceRepository deviceRepository;
     @Transactional
-    public Notification addNotification(NotificationRequest request, User user) {
+    public Notification addNotification(NotificationRequest request) {
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
         // DTO의 ID로 NotificationSetting 엔티티 조회
         NotificationSetting notificationSetting = notificationSettingRepository.findById(request.getNotificationSettingId())
                 .orElseThrow(() -> new IllegalArgumentException("알림 설정을 찾을 수 없습니다."));

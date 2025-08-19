@@ -31,12 +31,11 @@ public class NotificationApiController {
                 .body(notifications);
     }
 
-    @PostMapping("/sendNotification")
+    @PostMapping("/sendNotification/")
     public ResponseEntity<NotificationListResponse> addNotification(
-            @RequestBody NotificationRequest request,
-            @CurrentUser User user) {
+            @RequestBody NotificationRequest request) {
 
-        Notification savedNotification = notificationService.addNotification(request, user);
+        Notification savedNotification = notificationService.addNotification(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new NotificationListResponse(savedNotification));
     }

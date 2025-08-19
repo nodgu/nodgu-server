@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class NotificationRequest {
+    @JsonProperty("user_id")
+    private Long userId;
     private String title;
     private String description;
 
