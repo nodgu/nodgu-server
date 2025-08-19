@@ -38,6 +38,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/api/v1/notice/**").permitAll()
+                .requestMatchers("/api/v1/notification/sendNotification").permitAll()
                 .requestMatchers("/api/v1/sub/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/swagger-ui.html").permitAll()

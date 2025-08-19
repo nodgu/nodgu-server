@@ -31,7 +31,7 @@ public class NotificationApiController {
                 .body(notifications);
     }
 
-    @PostMapping("/myNotification")
+    @PostMapping("/sendNotification")
     public ResponseEntity<NotificationListResponse> addNotification(
             @RequestBody NotificationRequest request,
             @CurrentUser User user) {
