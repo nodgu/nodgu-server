@@ -35,6 +35,10 @@ jobs:
     - name: Set up environment variables
       run: |
         echo ${{ secrets.ENVFILE }} > .env
+    
+    - name: Set up firebase service account
+      run: |
+        echo ${{ secrets.FIREBASE_SERVICE_ACCOUNT }} > src/main/resources/firebase-service-account.json
 
     - name: Build with Gradle
       run: ./gradlew bootJar
