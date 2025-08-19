@@ -52,3 +52,6 @@ out/
 
 API_명세서
 logs/
+
+firebase-service-account.json
+.cursorignore
