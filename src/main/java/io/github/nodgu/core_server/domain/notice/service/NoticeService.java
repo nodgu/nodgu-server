@@ -102,7 +102,7 @@ public class NoticeService {
     }
 
     public List<Notice> getNoticeNoOcrData() {
-        return noticeRepository.findByOcrDataIsNull();
+        return noticeRepository.findByOcrDataNullOrEmpty();
     }
 
     public void addOcrData(Long id, String ocrData) {
