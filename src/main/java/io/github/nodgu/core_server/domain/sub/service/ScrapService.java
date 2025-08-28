@@ -51,4 +51,10 @@ public class ScrapService {
         // 스크랩 삭제
         scrapRepository.deleteById(id);
     }
+
+    public boolean isScrap(Long noticeId, User user) throws Exception {
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new IllegalArgumentException("공지를 찾을 수 없습니다. ID: " + noticeId));
+        return scrapRepository.findByUserAndNotice(user, notice).isPresent();
+    }
 }
