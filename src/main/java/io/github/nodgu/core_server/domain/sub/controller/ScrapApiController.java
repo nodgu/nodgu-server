@@ -40,10 +40,10 @@ public class ScrapApiController {
                 .body(ApiResponse.success("스크랩 추가 성공", null));
     }
 
-    @DeleteMapping("/myScrap/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteMyScrap(@PathVariable("id") Long id, User user) {
+    @DeleteMapping("/myScrap/{noticeId}")
+    public ResponseEntity<ApiResponse<Void>> deleteMyScrap(@PathVariable("noticeId") Long noticeId, User user) {
 
-        scrapService.deleteScrap(id, user);
+        scrapService.deleteScrap(noticeId, user);
 
         // 삭제 성공 시 응답 본문 없이 상태 코드 200 OK 반환
         return ResponseEntity.ok(ApiResponse.success("스크랩 삭제 성공", null));
