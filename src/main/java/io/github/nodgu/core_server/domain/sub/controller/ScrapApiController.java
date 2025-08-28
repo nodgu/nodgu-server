@@ -32,12 +32,12 @@ public class ScrapApiController {
     }
 
     @PostMapping("/myScrap")
-    public ResponseEntity<ApiResponse<Scrap>> addScrap(@RequestBody ScrapRequest request, @CurrentUser User user) {
+    public ResponseEntity<ApiResponse<Void>> addScrap(@RequestBody ScrapRequest request, @CurrentUser User user) {
         Scrap savedScrap = scrapService.addScrap(request, user);
 
         // 생성된 스크랩 정보를 응답 객체에 담아 전송 (HTTP 상태 코드 201 Created)
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("스크랩 추가 성공", savedScrap));
+                .body(ApiResponse.success("스크랩 추가 성공", null));
     }
 
     @DeleteMapping("/myScrap/{id}")
@@ -47,5 +47,12 @@ public class ScrapApiController {
 
         // 삭제 성공 시 응답 본문 없이 상태 코드 200 OK 반환
         return ResponseEntity.ok(ApiResponse.success("스크랩 삭제 성공", null));
+    }
+
+    @GetMapping("/myScrap/isScrap/{noticeId}")
+    public ResponseEntity<ApiResponse<Boolean>> isScrap(@PathVariable("noticeId") Long noticeId,
+            @CurrentUser User user) throws Exception {
+        boolean isScrap = scrapService.isScrap(noticeId, user);
+        return ResponseEntity.ok(ApiResponse.success("스크랩 여부 조회 성공", isScrap));
     }
 }

@@ -27,54 +27,52 @@ public class NoticeService {
     }
 
     public void createNotice(NoticeRequest request) {
-        String tdindex = request.getTdindex();
+        String tdindex = request.getTitle() + request.getDescription();
 
         boolean exists = noticeRepository.existsByUnivCodeAndOrgCodeAndSubCodeAndTdindex(
-            request.getUnivCode(),
-            request.getOrgCode(),
-            request.getSubCode(),
-            tdindex
-        );
+                request.getUnivCode(),
+                request.getOrgCode(),
+                request.getSubCode(),
+                tdindex);
 
         if (exists) {
             throw new IllegalStateException("이미 동일한 공지사항이 존재합니다.");
         }
 
         Notice notice = new Notice(
-            request.getNoticeId(),
-            request.getTitle(),
-            request.getUrl(),
-            request.getDescription(),
-            request.getNotitype(),
-            request.getDate(),
-            tdindex,
-            request.getImgs(),
-            request.getLinks(),
-            request.getAttachments(),
-            request.getOcrData(),
-            request.getUnivCode(),
-            request.getOrgCode(),
-            request.getSubCode()
-        );
+                request.getNoticeId(),
+                request.getTitle(),
+                request.getUrl(),
+                request.getDescription(),
+                request.getNotitype(),
+                request.getDate(),
+                tdindex,
+                request.getImgs(),
+                request.getLinks(),
+                request.getAttachments(),
+                request.getOcrData(),
+                request.getUnivCode(),
+                request.getOrgCode(),
+                request.getSubCode());
 
         noticeRepository.save(notice);
     }
 
     public NoticeDetailResponse getNoticeDetail(Long id) {
         Notice notice = noticeRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("해당 공지를 찾을 수 없습니다"));
+                .orElseThrow(() -> new IllegalArgumentException("해당 공지를 찾을 수 없습니다"));
         return NoticeDetailResponse.from(notice);
     }
 
-    public NoticeListResponse getNoticeList(String notitype, int pageNum) {
+    public NoticeListResponse getNoticeList(String[] notitypes, int pageNum) {
         int pageSize = 10;
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
 
         Page<Notice> noticePage;
-        if ("all".equalsIgnoreCase(notitype)) {
+        if (notitypes.length == 0 || "all".equalsIgnoreCase(notitypes[0])) {
             noticePage = noticeRepository.findAll(pageable);
         } else {
-            noticePage = noticeRepository.findByNotitype(notitype, pageable);
+            noticePage = noticeRepository.findByNotitypes(notitypes, pageable);
         }
 
         List<Notice> notices = noticePage.getContent();
@@ -83,10 +81,17 @@ public class NoticeService {
         return NoticeListResponse.from(notices, totalCount, pageNum);
     }
 
-    public NoticeListResponse getSearchNoticeList(String query, String notitype, int pageNum) {
+    public NoticeListResponse getSearchNoticeList(String query, String[] notitypes, int pageNum) {
         int pageSize = 10;
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
-        Page<Notice> noticePage = noticeRepository.searchByQueryAndNotitype(query, notitype, pageable);
+
+        Page<Notice> noticePage;
+        if (notitypes.length == 0 || "all".equalsIgnoreCase(notitypes[0])) {
+            // 모든 타입 검색
+            noticePage = noticeRepository.searchByQuery(query, pageable);
+        } else {
+            noticePage = noticeRepository.searchByQueryAndNotitypes(query, notitypes, pageable);
+        }
 
         List<Notice> notices = noticePage.getContent();
         long totalCount = noticePage.getTotalElements();
@@ -96,7 +101,7 @@ public class NoticeService {
 
     public void updateNotice(Long id, NoticeRequest request) {
         Notice notice = noticeRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("해당 공지를 찾을 수 없습니다"));
+                .orElseThrow(() -> new IllegalArgumentException("해당 공지를 찾을 수 없습니다"));
         notice.update(request);
         noticeRepository.save(notice);
     }
@@ -107,7 +112,7 @@ public class NoticeService {
 
     public void addOcrData(Long id, String ocrData) {
         Notice notice = noticeRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("해당 공지를 찾을 수 없습니다"));
+                .orElseThrow(() -> new IllegalArgumentException("해당 공지를 찾을 수 없습니다"));
         notice.setOcrData(ocrData);
         noticeRepository.save(notice);
     }

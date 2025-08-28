@@ -16,21 +16,36 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     Page<Notice> findByNotitype(String notitype, Pageable pageable);
 
+    // 배열 형태의 notitypes를 처리하는 메서드 추가
+    @Query("SELECT n FROM Notice n WHERE n.notitype IN :notitypes")
+    Page<Notice> findByNotitypes(@Param("notitypes") String[] notitypes, Pageable pageable);
+
     @Query("SELECT n FROM Notice n WHERE " +
-           "(:notitype = 'all' OR n.notitype = :notitype) AND " +
-           "(n.title LIKE %:query% OR n.description LIKE %:query%)")
+            "(:notitype = 'all' OR n.notitype = :notitype) AND " +
+            "(n.title LIKE %:query% OR n.description LIKE %:query%)")
     Page<Notice> searchByQueryAndNotitype(@Param("query") String query,
-                                          @Param("notitype") String notitype,
-                                          Pageable pageable);
+            @Param("notitype") String notitype,
+            Pageable pageable);
+
+    // 배열 형태의 notitypes를 사용하는 검색 메서드 추가
+    @Query("SELECT n FROM Notice n WHERE " +
+            "n.notitype IN :notitypes AND " +
+            "(n.title LIKE %:query% OR n.description LIKE %:query%)")
+    Page<Notice> searchByQueryAndNotitypes(@Param("query") String query,
+            @Param("notitypes") String[] notitypes,
+            Pageable pageable);
+
+    // 모든 타입에서 검색하는 메서드 추가
+    @Query("SELECT n FROM Notice n WHERE n.title LIKE %:query% OR n.description LIKE %:query%")
+    Page<Notice> searchByQuery(@Param("query") String query, Pageable pageable);
 
     Optional<Notice> findByNoticeId(String noticeId);
 
     boolean existsByUnivCodeAndOrgCodeAndSubCodeAndTdindex(
-        String univCode,
-        String orgCode,
-        String subCode,
-        String tdindex
-    );
+            String univCode,
+            String orgCode,
+            String subCode,
+            String tdindex);
 
     // OCR 데이터가 null이거나 빈 문자열인 공지사항 조회
     @Query("SELECT n FROM Notice n WHERE n.ocrData IS NULL OR n.ocrData = '' OR n.ocrData = ' ' OR TRIM(n.ocrData) = ''")
@@ -39,4 +54,3 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     // 기존 메서드 (하위 호환성을 위해 유지)
     List<Notice> findByOcrDataIsNull();
 }
-

@@ -29,7 +29,7 @@ public class NoticeController {
 
     @GetMapping("/notice")
     public ResponseEntity<ApiResponse<NoticeListResponse>> getNoticeList(
-            @RequestParam(name = "notitype", defaultValue = "all") String notitype,
+            @RequestParam(name = "notitype", defaultValue = "all") String[] notitypes,
             @RequestParam(name = "page", defaultValue = "1") String page) {
         int pageNum;
         try {
@@ -39,7 +39,7 @@ public class NoticeController {
                     .body(ApiResponse.error("페이지 번호는 숫자만 가능합니다", 400));
         }
 
-        NoticeListResponse noticeList = noticeService.getNoticeList(notitype, pageNum);
+        NoticeListResponse noticeList = noticeService.getNoticeList(notitypes, pageNum);
         return ResponseEntity.ok(ApiResponse.success(noticeList));
     }
 
@@ -47,7 +47,7 @@ public class NoticeController {
     public ResponseEntity<ApiResponse<NoticeDetailResponse>> getNotice(@PathVariable("id") Long id) {
         if (id == null) {
             return ResponseEntity.status(500)
-                .body(ApiResponse.error("공지의 id 값이 전달되지 않았습니다", 500));
+                    .body(ApiResponse.error("공지의 id 값이 전달되지 않았습니다", 500));
         }
 
         NoticeDetailResponse noticeDetail = noticeService.getNoticeDetail(id);
@@ -55,9 +55,9 @@ public class NoticeController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<NoticeListResponse>> getSearchNotice (@RequestParam(name = "query") String query,
-		                                                                    @RequestParam(name = "notitype", defaultValue = "all") String notitype,
-    	                                                                    @RequestParam(name = "page", defaultValue = "1") String page) {
+    public ResponseEntity<ApiResponse<NoticeListResponse>> getSearchNotice(@RequestParam(name = "query") String query,
+            @RequestParam(name = "notitype", defaultValue = "all") String[] notitypes,
+            @RequestParam(name = "page", defaultValue = "1") String page) {
         int pageNum;
         try {
             pageNum = Integer.parseInt(page);
@@ -66,7 +66,7 @@ public class NoticeController {
                     .body(ApiResponse.error("페이지 번호는 숫자만 가능합니다", 400));
         }
 
-        NoticeListResponse searchNoticeList = noticeService.getSearchNoticeList(query, notitype, pageNum);
+        NoticeListResponse searchNoticeList = noticeService.getSearchNoticeList(query, notitypes, pageNum);
         return ResponseEntity.ok(ApiResponse.success(searchNoticeList));
     }
 
@@ -85,7 +85,8 @@ public class NoticeController {
     }
 
     @PatchMapping("/notice/{id}")
-    public ResponseEntity<ApiResponse<String>> updateNotice(@PathVariable("id") Long id, @RequestBody NoticeRequest noticeRequest) {
+    public ResponseEntity<ApiResponse<String>> updateNotice(@PathVariable("id") Long id,
+            @RequestBody NoticeRequest noticeRequest) {
         noticeService.updateNotice(id, noticeRequest);
         return ResponseEntity.ok(ApiResponse.success("공지사항이 성공적으로 수정되었습니다"));
     }
