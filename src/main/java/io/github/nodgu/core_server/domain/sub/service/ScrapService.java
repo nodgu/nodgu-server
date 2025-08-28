@@ -43,13 +43,15 @@ public class ScrapService {
     }
 
     @Transactional
-    public void deleteScrap(Long id, User user) {
+    public void deleteScrap(Long noticeId, User user) {
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new IllegalArgumentException("공지를 찾을 수 없습니다. ID: " + noticeId));
         // 삭제하려는 Scrap 엔티티 조회
-        Scrap scrap = scrapRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("삭제할 스크랩을 찾을 수 없습니다. ID: " + id));
+        Scrap scrap = scrapRepository.findByUserAndNotice(user, notice)
+                .orElseThrow(() -> new IllegalArgumentException("삭제할 스크랩을 찾을 수 없습니다. ID: " + noticeId));
 
         // 스크랩 삭제
-        scrapRepository.deleteById(id);
+        scrapRepository.delete(scrap);
     }
 
     public boolean isScrap(Long noticeId, User user) throws Exception {
