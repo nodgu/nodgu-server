@@ -8,6 +8,7 @@ import io.github.nodgu.core_server.domain.notice.service.NoticeService;
 import io.github.nodgu.core_server.global.dto.ApiResponse;
 import io.github.nodgu.core_server.global.util.JwtUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +56,11 @@ public class NoticeController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<NoticeListResponse>> getSearchNotice (@RequestParam(name = "query") String query,
-		                                                                    @RequestParam(name = "notitype", defaultValue = "all") String notitype,
-    	                                                                    @RequestParam(name = "page", defaultValue = "1") String page) {
+    public ResponseEntity<ApiResponse<NoticeListResponse>> getSearchNotice(
+            @RequestParam(name = "query", defaultValue = "") String query,
+            @RequestParam(name = "notitype", defaultValue = "all") String notitype,
+            @RequestParam(name = "page", defaultValue = "1") String page) {
+
         int pageNum;
         try {
             pageNum = Integer.parseInt(page);
@@ -66,8 +69,30 @@ public class NoticeController {
                     .body(ApiResponse.error("페이지 번호는 숫자만 가능합니다", 400));
         }
 
-        NoticeListResponse searchNoticeList = noticeService.getSearchNoticeList(query, notitype, pageNum);
-        return ResponseEntity.ok(ApiResponse.success(searchNoticeList));
+        List<String> includeKeywords = new ArrayList<>();
+        List<String> excludeKeywords = new ArrayList<>();
+
+        if (query != null && !query.isBlank()) {
+            String[] tokens = query.trim().split("\\s+");
+            for (String token : tokens) {
+                token = token.trim();
+                if (token.isEmpty()) continue;
+
+                if (token.startsWith("-") && token.length() > 1) {
+                    excludeKeywords.add(token.substring(1));
+                } else if (token.startsWith("+") && token.length() > 1) {
+                    includeKeywords.add(token.substring(1));
+                } else {
+                    includeKeywords.add(token);
+                }
+            }
+        }
+
+        NoticeListResponse result = noticeService.getSearchNoticeList(
+                includeKeywords, excludeKeywords, notitype, pageNum
+        );
+
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     @PostMapping("/notice")

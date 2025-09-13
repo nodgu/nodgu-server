@@ -83,16 +83,25 @@ public class NoticeService {
         return NoticeListResponse.from(notices, totalCount, pageNum);
     }
 
-    public NoticeListResponse getSearchNoticeList(String query, String notitype, int pageNum) {
+    public NoticeListResponse getSearchNoticeList(
+            List<String> includeKeywords,
+            List<String> excludeKeywords,
+            String notitype,
+            int pageNum) {
+
         int pageSize = 10;
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
-        Page<Notice> noticePage = noticeRepository.searchByQueryAndNotitype(query, notitype, pageable);
+
+        Page<Notice> noticePage = noticeRepository.searchByKeywordsAndNotitype(
+                includeKeywords, excludeKeywords, notitype, pageable
+        );
 
         List<Notice> notices = noticePage.getContent();
         long totalCount = noticePage.getTotalElements();
 
         return NoticeListResponse.from(notices, totalCount, pageNum);
     }
+
 
     public void updateNotice(Long id, NoticeRequest request) {
         Notice notice = noticeRepository.findById(id)
