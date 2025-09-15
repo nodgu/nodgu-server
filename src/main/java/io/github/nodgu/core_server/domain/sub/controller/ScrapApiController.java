@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import io.github.nodgu.core_server.domain.sub.entity.Scrap;
 import io.github.nodgu.core_server.domain.sub.dto.ScrapRequest;
 import io.github.nodgu.core_server.domain.sub.dto.ScrapListResponse;
+import io.github.nodgu.core_server.domain.notice.dto.NoticeListResponse.NoticeDto;
 import io.github.nodgu.core_server.domain.sub.service.ScrapService;
 import io.github.nodgu.core_server.domain.user.entity.User;
 import io.github.nodgu.core_server.global.annotation.CurrentUser;
@@ -41,7 +42,8 @@ public class ScrapApiController {
     }
 
     @DeleteMapping("/myScrap/{noticeId}")
-    public ResponseEntity<ApiResponse<Void>> deleteMyScrap(@PathVariable("noticeId") Long noticeId, User user) {
+    public ResponseEntity<ApiResponse<Void>> deleteMyScrap(@PathVariable("noticeId") Long noticeId,
+            @CurrentUser User user) {
 
         scrapService.deleteScrap(noticeId, user);
 
@@ -54,5 +56,12 @@ public class ScrapApiController {
             @CurrentUser User user) throws Exception {
         boolean isScrap = scrapService.isScrap(noticeId, user);
         return ResponseEntity.ok(ApiResponse.success("스크랩 여부 조회 성공", isScrap));
+    }
+
+    @GetMapping("/myScrap/scrapedNotices")
+    public ResponseEntity<ApiResponse<List<NoticeDto>>> getScrapedNotice(@CurrentUser User user)
+            throws Exception {
+        List<NoticeDto> scrapedNotice = scrapService.getScrapedNotice(user);
+        return ResponseEntity.ok(ApiResponse.success("스크랩 공지 조회 성공", scrapedNotice));
     }
 }

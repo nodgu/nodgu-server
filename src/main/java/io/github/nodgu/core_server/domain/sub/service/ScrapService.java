@@ -3,6 +3,7 @@ package io.github.nodgu.core_server.domain.sub.service;
 import io.github.nodgu.core_server.domain.sub.dto.ScrapRequest;
 import io.github.nodgu.core_server.domain.sub.entity.Scrap;
 import io.github.nodgu.core_server.domain.sub.repository.ScrapRepository;
+import io.github.nodgu.core_server.domain.notice.dto.NoticeListResponse.NoticeDto;
 import io.github.nodgu.core_server.domain.notice.entity.Notice;
 import io.github.nodgu.core_server.domain.notice.repository.NoticeRepository;
 import io.github.nodgu.core_server.domain.user.entity.User;
@@ -37,17 +38,25 @@ public class ScrapService {
     }
 
     public List<Scrap> findAllScraps(User user) {
+        // User 엔티티를 영속성 컨텍스트에 다시 연결
+        User managedUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. ID: " + user.getId()));
+
         // 해당 사용자가 스크랩한 모든 Scrap 엔티티를 조회
-        // ScrapRepository에 findByUser(User user) 메서드가 필요
-        return scrapRepository.findByUser(user);
+        return scrapRepository.findByUser(managedUser);
     }
 
     @Transactional
     public void deleteScrap(Long noticeId, User user) {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("공지를 찾을 수 없습니다. ID: " + noticeId));
+
+        // User 엔티티를 영속성 컨텍스트에 다시 연결
+        User managedUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. ID: " + user.getId()));
+
         // 삭제하려는 Scrap 엔티티 조회
-        Scrap scrap = scrapRepository.findByUserAndNotice(user, notice)
+        Scrap scrap = scrapRepository.findByUserAndNotice(managedUser, notice)
                 .orElseThrow(() -> new IllegalArgumentException("삭제할 스크랩을 찾을 수 없습니다. ID: " + noticeId));
 
         // 스크랩 삭제
@@ -57,6 +66,19 @@ public class ScrapService {
     public boolean isScrap(Long noticeId, User user) throws Exception {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("공지를 찾을 수 없습니다. ID: " + noticeId));
-        return scrapRepository.findByUserAndNotice(user, notice).isPresent();
+
+        // User 엔티티를 영속성 컨텍스트에 다시 연결
+        User managedUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. ID: " + user.getId()));
+
+        return scrapRepository.findByUserAndNotice(managedUser, notice).isPresent();
+    }
+
+    public List<NoticeDto> getScrapedNotice(User user) {
+        List<Scrap> scraps = scrapRepository.findByUser(user);
+        return scraps.stream()
+                .map(Scrap::getNotice)
+                .map(NoticeDto::from)
+                .toList();
     }
 }
