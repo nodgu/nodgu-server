@@ -13,7 +13,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -85,13 +88,23 @@ public class NoticeService {
         int pageSize = 10;
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
 
-        Page<Notice> noticePage;
-        if (notitypes.length == 0 || "all".equalsIgnoreCase(notitypes[0])) {
-            // 모든 타입 검색
-            noticePage = noticeRepository.searchByQuery(query, pageable);
-        } else {
-            noticePage = noticeRepository.searchByQueryAndNotitypes(query, notitypes, pageable);
+        // 공백 기준 토큰화, 연속 공백 제거
+        List<String> rawTokens = Arrays.stream(query == null ? new String[] {} : query.trim().split("\\s+"))
+                .filter(token -> token != null && !token.isBlank())
+                .collect(Collectors.toList());
+
+        List<String> includeTokens = new ArrayList<>();
+        List<String> excludeTokens = new ArrayList<>();
+
+        for (String token : rawTokens) {
+            if (token.startsWith("-") && token.length() > 1) {
+                excludeTokens.add(token.substring(1));
+            } else {
+                includeTokens.add(token);
+            }
         }
+
+        Page<Notice> noticePage = noticeRepository.advancedSearch(includeTokens, excludeTokens, notitypes, pageable);
 
         List<Notice> notices = noticePage.getContent();
         long totalCount = noticePage.getTotalElements();
