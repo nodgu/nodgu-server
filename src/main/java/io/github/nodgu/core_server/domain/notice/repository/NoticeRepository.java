@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Repository
 public interface NoticeRepository extends JpaRepository<Notice, Long>, NoticeRepositoryCustom {
@@ -53,4 +54,10 @@ public interface NoticeRepository extends JpaRepository<Notice, Long>, NoticeRep
 
     // 기존 메서드 (하위 호환성을 위해 유지)
     List<Notice> findByOcrDataIsNull();
+
+    // 최근 1시간 내 생성되고 tdindex에 키워드가 포함된 공지의 ID만 조회
+    @Query("SELECT n.id FROM Notice n WHERE n.date >= :since AND n.date < :until AND n.tdindex LIKE %:keyword%")
+    List<Long> findRecentNoticeIdsByKeyword(@Param("keyword") String keyword,
+            @Param("since") LocalDateTime since,
+            @Param("until") LocalDateTime until);
 }

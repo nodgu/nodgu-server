@@ -24,18 +24,23 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final NoticeRepository noticeRepository;
-    private final NotificationSettingRepository notificationSettingRepository; 
+    private final NotificationSettingRepository notificationSettingRepository;
     private final FcmPushService fcmPushService;
     private final DeviceRepository deviceRepository;
+
     @Transactional
     public Notification addNotification(NotificationRequest request) {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // DTO의 ID로 NotificationSetting 엔티티 조회
-        NotificationSetting notificationSetting = notificationSettingRepository.findById(request.getNotificationSettingId())
-                .orElseThrow(() -> new IllegalArgumentException("알림 설정을 찾을 수 없습니다."));
-        
+        // DTO의 ID로 NotificationSetting 엔티티 조회 (null 허용)
+        NotificationSetting notificationSetting = null;
+        if (request.getNotificationSettingId() != null) {
+            notificationSetting = notificationSettingRepository
+                    .findById(request.getNotificationSettingId())
+                    .orElseThrow(() -> new IllegalArgumentException("알림 설정을 찾을 수 없습니다."));
+        }
+
         // noticeId가 null일 수 있으므로 조건부로 처리
         Notice notice = null;
         if (request.getNoticeId() != null) {
@@ -46,7 +51,7 @@ public class NotificationService {
         Notification new_notification = Notification.builder()
                 .user(user)
                 .notificationSetting(notificationSetting)
-                .notice(notice)  // null일 수 있음
+                .notice(notice) // null일 수 있음
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .remindDate(request.getRemindDate())
@@ -55,8 +60,9 @@ public class NotificationService {
         // 알림 설정에 따라 푸시 알림 전송
         Device device = deviceRepository.findByUser(user)
                 .orElseThrow(() -> new IllegalArgumentException("Device를 찾을 수 없습니다."));
-        fcmPushService.sendPushNotification(device.getFcmToken(), new_notification.getTitle(), new_notification.getDescription());
-       
+        fcmPushService.sendPushNotification(device.getFcmToken(), new_notification.getTitle(),
+                new_notification.getDescription());
+
         return notificationRepository.save(new_notification);
     }
 
