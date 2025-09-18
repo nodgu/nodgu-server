@@ -23,9 +23,14 @@ public class ScrapService {
 
     @Transactional // data 변경 시 transaction 내에서 이루어져야 해서 필요한 annotation
     public Scrap addScrap(ScrapRequest request, User user) {
+        long currentCount = scrapRepository.countByUser(user);
+        if (currentCount >= 100) {
+            throw new IllegalStateException("스크랩은 사용자당 최대 100개까지 가능합니다");
+        }
         // 스크랩하려는 Notice 엔티티 조회
         Notice notice = noticeRepository.findById(request.getNoticeId())
-                .orElseThrow(() -> new IllegalArgumentException("공지를 찾을 수 없습니다. ID: " + request.getNoticeId()));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "공지를 찾을 수 없습니다. ID: " + request.getNoticeId()));
 
         // Scrap 엔티티 생성 (@Builder 사용)
         Scrap newScrap = Scrap.builder()
