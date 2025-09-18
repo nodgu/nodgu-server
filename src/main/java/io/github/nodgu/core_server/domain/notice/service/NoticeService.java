@@ -69,7 +69,8 @@ public class NoticeService {
 
     public NoticeListResponse getNoticeList(String[] notitypes, int pageNum) {
         int pageSize = 10;
-        Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
+        Pageable pageable = PageRequest.of(pageNum - 1, pageSize,
+                org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "date"));
 
         Page<Notice> noticePage;
         if (notitypes.length == 0 || "all".equalsIgnoreCase(notitypes[0])) {
