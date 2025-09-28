@@ -43,10 +43,9 @@ public class Notification {
     @JoinColumn(name = "notice_id")
     private Notice notice;
 
-    // 어떤 notificationSetting에서 왔는지 알아야 할 것 같아서 추가했음
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "notification_setting")
-    private NotificationSetting notificationSetting; // 이거 추가함에 따라 노션 DB Schema 수정했으니 검토 필요
+    private NotificationSetting notificationSetting;
 
     @Builder
     public Notification(String title, String description, LocalDateTime remindDate, User user, Notice notice, NotificationSetting notificationSetting) {

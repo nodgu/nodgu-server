@@ -2,7 +2,7 @@ package io.github.nodgu.core_server.domain.notification.entity;
 
 import io.github.nodgu.core_server.domain.user.entity.User;
 import io.github.nodgu.core_server.domain.sub.entity.Keyword;
-import io.github.nodgu.core_server.domain.sub.entity.Keyword;
+// import io.github.nodgu.core_server.domain.sub.entity.Keyword;
 import jakarta.persistence.*;
 import lombok.*;
 
