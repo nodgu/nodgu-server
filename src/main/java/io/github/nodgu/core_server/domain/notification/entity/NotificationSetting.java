@@ -31,6 +31,9 @@ public class NotificationSetting {
     @Column(name = "alarm_time")
     private String alarmTime;
 
+    @Column(name = "is_active")
+    private Boolean is_active;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -43,5 +46,6 @@ public class NotificationSetting {
         this.alarmDays = alarmDays;
         this.alarmTime = alarmTime;
         this.user = user;
+        this.is_active = is_active;
     }
 }

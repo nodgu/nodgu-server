@@ -1,6 +1,6 @@
 package io.github.nodgu.core_server.domain.menu.controller;
 
-import io.github.nodgu.core_server.domain.menu.dto.RestaurantRequest;
+import io.github.nodgu.core_server.domain.menu.dto.MenuRequest;
 import io.github.nodgu.core_server.domain.menu.dto.RestaurantResponse;
 import io.github.nodgu.core_server.domain.menu.entity.Restaurant;
 import io.github.nodgu.core_server.domain.menu.service.RestaurantService;
@@ -9,12 +9,12 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/restaurants")
+@RequestMapping("/api/v1/menu")
 @RequiredArgsConstructor
-public class RestaurantController {
+public class RestaurantApiController {
     private final RestaurantService restaurantService;
 
-    @PostMapping
+    @PostMapping("/restaurants")
     public ResponseEntity<RestaurantResponse> getRestaurant(@RequestBody MenuRequest request) {
         Restaurant restaurant = restaurantService.getById(request.getRestaurantId());
         

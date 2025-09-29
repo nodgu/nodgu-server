@@ -1,16 +1,21 @@
 package io.github.nodgu.core_server.domain.menu.controller;
 
+import io.github.nodgu.core_server.domain.menu.service.MenuService;
+import io.github.nodgu.core_server.domain.menu.dto.MenuRequest;
+import io.github.nodgu.core_server.domain.menu.dto.MenuResponse;
+import io.github.nodgu.core_server.domain.menu.entity.Menu;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/menus")
+@RequestMapping("/api/v1/menu")
 @RequiredArgsConstructor
-public class MenuController {
+public class MenuApiController {
     private final MenuService menuService;
 
-    @PostMapping
+    @PostMapping("/menus")
     public ResponseEntity<MenuResponse> getMenu(@RequestBody MenuRequest request) {
         Menu menu = menuService.getMenu(request);
 

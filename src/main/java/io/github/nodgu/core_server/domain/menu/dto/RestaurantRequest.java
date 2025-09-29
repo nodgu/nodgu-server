@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class RestaurantIdRequest {
+public class RestaurantRequest {
     @JsonProperty("restaurant_id")
     private Long restaurantId;
 }
