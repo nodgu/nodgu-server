@@ -100,7 +100,7 @@ public class KeywordController {
         Long userId = getUserIdFromRequest(request);
         if (userId == null) {
             return ResponseEntity.status(401)
-                    .body(ApiResponse.error("로그인이 필요한 기능입니다", 401));
+                    .body(ApiResponse.error("로그인이 필요한 기능입니다.", 401));
         }
 
         try {

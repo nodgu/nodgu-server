@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface KeywordRepository extends JpaRepository<Keyword, Long> {
     List<Keyword> findByUser_Id(Long userId);
-    boolean existsByUser_IdAndTitle(Long userId, String title);
+    Boolean existsByUser_IdAndTitle(Long userId, String title);
 }

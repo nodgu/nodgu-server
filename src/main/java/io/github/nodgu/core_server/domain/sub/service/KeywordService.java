@@ -24,7 +24,7 @@ public class KeywordService {
     public List<KeywordListResponse> getKeywordList(Long userId) {
         List<Keyword> keywords = keywordRepository.findByUser_Id(userId);
         return keywords.stream()
-                .map(k -> new KeywordListResponse(k.getId(), k.getTitle()))
+                .map(k -> new KeywordListResponse(k.getId(), k.getTitle(), k.getIsActive()))
                 .collect(Collectors.toList());
     }
 
@@ -36,6 +36,7 @@ public class KeywordService {
         Keyword keyword = new Keyword();
         keyword.setTitle(request.getTitle());
         keyword.setUserId(userId);
+        keyword.setIsActive(true);
         keywordRepository.save(keyword);
     }
 
@@ -46,7 +47,10 @@ public class KeywordService {
             throw new SecurityException("권한이 없습니다");
         }
         keyword.setTitle(request.getTitle());
-        keywordRepository.save(keyword);
+        if (request.getIsActive() != null) {
+            keyword.setIsActive(request.getIsActive());
+        }
+        // keywordRepository.save(keyword);
     }
 
     public void deleteKeyword(Long userId, Long id) {

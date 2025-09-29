@@ -18,6 +18,6 @@ public class MenuService {
     public Menu getMenu(MenuRequest request) {
         return menuRepository
                 .findByRestaurant_IdAndDate(request.getRestaurantId(), request.getDate())
-                .orElseThrow(() -> new ResponseStatusException("해당 조건의 학식 정보가 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 조건의 학식 정보가 없습니다."));
     }
 }

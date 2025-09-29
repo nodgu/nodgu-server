@@ -17,6 +17,6 @@ public class RestaurantService {
     @Transactional(readOnly = true)
     public Restaurant getById(Long id) {
         return restaurantRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException("해당 식당이 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 식당이 없습니다."));
     }
 }

@@ -15,14 +15,18 @@ public class Keyword {
     @Column(nullable = false)
     private String title;
 
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Keyword() {}
+    public Keyword() { this.isActive = true; }
 
     public Keyword(String title) {
         this.title = title;
+        this.isActive = true;
     }
 
     public void setUserId(Long userId) {
@@ -50,5 +54,13 @@ public class Keyword {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 }
