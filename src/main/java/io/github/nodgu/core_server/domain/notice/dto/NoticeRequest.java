@@ -75,7 +75,7 @@ public class NoticeRequest {
         return description;
     }
 
-    public void setDesciption(String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 

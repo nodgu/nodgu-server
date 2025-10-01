@@ -2,6 +2,7 @@ package io.github.nodgu.core_server.domain.menu.controller;
 
 import io.github.nodgu.core_server.domain.menu.service.MenuService;
 import io.github.nodgu.core_server.domain.menu.dto.MenuRequest;
+import io.github.nodgu.core_server.domain.menu.dto.MenuAllRequest;
 import io.github.nodgu.core_server.domain.menu.dto.MenuResponse;
 import io.github.nodgu.core_server.domain.menu.entity.Menu;
 

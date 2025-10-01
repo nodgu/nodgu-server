@@ -10,10 +10,21 @@ import java.util.List;
 @Getter
 @Setter
 public class MenuRequest {
-    // DB에서 한 번에 가져와서 프론트에서는 식당마다 빠르게 출력하기 위함
-    // @JsonProperty("restaurant_id")
-    // private Long restaurantId;
+    @JsonProperty("id")
+    private Long id;
+
+    @JsonProperty("restaurant_id")
+    private Long restaurantId;
     
     @JsonProperty("date")
     private String date;
+
+    @JsonProperty("time")
+    private String time;
+
+    @JsonProperty("division")
+    private char division;
+
+    @JsonProperty("food")
+    private List<String> food;
 }

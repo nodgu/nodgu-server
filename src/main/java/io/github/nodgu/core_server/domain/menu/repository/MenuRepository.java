@@ -15,5 +15,10 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     //     join fetch m.restaurant r
     //     where r.id = :restaurantId and m.date = :date
     // """)
-    Optional<Menu> findByRestaurant_IdAndDate(@Param("restaurantId") Long restaurantId, @Param("date") String date);
+    Optional<Menu> findByDate(@Param("date") String date);
+
+    boolean exist(
+        String date,
+        Long restaurantId
+    );
 }
