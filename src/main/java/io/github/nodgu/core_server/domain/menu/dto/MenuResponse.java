@@ -10,23 +10,21 @@ import java.util.List;
 public class MenuResponse {
     private Long id;
     private String time;
-    private char division;
+    private String corner;
     private List<String> food;
     private String univ;
     private String campus;
     private String name;
-    private String address;
     private String activated;
 
     public MenuResponse(Menu request) {
         this.id = request.getId();
         this.time = request.getTime();
-        this.division = request.getDivision();
+        this.corner = request.getCorner();
         this.food = request.getFood();
         this.univ = request.getRestaurant().getUniv();
         this.campus = request.getRestaurant().getCampus();
         this.name = request.getRestaurant().getName();
-        this.address = request.getRestaurant().getAddress();
-        this.activated = request.getRestaurant().getActivated();
+        this.activated = request.getActivated();
     }
 }

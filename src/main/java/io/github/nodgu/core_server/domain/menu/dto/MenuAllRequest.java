@@ -9,22 +9,27 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class MenuRequest {
+public class MenuAllRequest {
     @JsonProperty("id")
     private Long id;
 
     @JsonProperty("restaurant_id")
     private Long restaurantId;
-    
+
     @JsonProperty("date")
     private String date;
 
     @JsonProperty("time")
     private String time;
 
-    @JsonProperty("division")
-    private char division;
+    @JsonProperty("corner")
+    private String corner;
+
+    @JsonProperty("activated")
+    private String activated;
 
     @JsonProperty("food")
     private List<String> food;
+
+    public String getActivated() { return this.activated; }
 }

@@ -6,6 +6,9 @@ import io.github.nodgu.core_server.domain.menu.dto.MenuAllRequest;
 import io.github.nodgu.core_server.domain.menu.dto.MenuResponse;
 import io.github.nodgu.core_server.domain.menu.entity.Menu;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -22,5 +25,12 @@ public class MenuApiController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new MenuResponse(menu));
+    }
+
+    @PostMapping("/allmenus")
+    public ResponseEntity<MenuResponse> saveMenu(@RequestBody List<MenuAllRequest> requests) {
+        menuService.saveMenu(requests);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

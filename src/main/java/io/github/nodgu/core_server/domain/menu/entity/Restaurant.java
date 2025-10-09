@@ -17,6 +17,9 @@ public class Restaurant {
     @Column(name = "id", updatable = false)
     private Long id;
 
+    @Column(name = "restaurant_id", updatable = false)
+    private Long restaurantId;
+
     @Column(name = "univ")
     private String univ;
 
@@ -26,21 +29,14 @@ public class Restaurant {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "address")
-    private String address;
-
-    @Column(name = "activated")
-    private String activated;
-
     @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY)
     private List<Menu> menus = new ArrayList<>();
 
     @Builder
-    public Restaurant(String univ, String campus, String name, String address, String activated) {
+    public Restaurant(Long restaurantId, String univ, String campus, String name) {
+        this.restaurantId = restaurantId;
         this.univ = univ;
         this.campus = campus;
         this.name = name;
-        this.address = address;
-        this.activated = activated;
     }
 }

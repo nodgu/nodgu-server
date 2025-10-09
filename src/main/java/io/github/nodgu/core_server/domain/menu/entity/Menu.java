@@ -1,5 +1,6 @@
 package io.github.nodgu.core_server.domain.menu.entity;
 
+import io.github.nodgu.core_server.global.converter.StringListJsonConverter;
 import io.github.nodgu.core_server.domain.menu.entity.Restaurant;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,19 +29,24 @@ public class Menu {
     @Column(name = "time")
     private String time;
 
-    @Column(name = "division")
-    private char division;
+    @Column(name = "corner")
+    private String corner;
+    
+    @Column(name = "activated")
+    private String activated;
 
-    @ElementCollection
-    @Column(name = "food")
+    @Column(name="food")
     private List<String> food = new ArrayList<>();
 
+    public String getActivated() { return this.activated; }
+
     @Builder
-    public Menu(Restaurant restaurant, String date, String time, char division, List<String> food) {
+    public Menu(Restaurant restaurant, String date, String time, String corner, String activated, List<String> food) {
         this.restaurant = restaurant;
         this.date = date;
         this.time = time;
-        this.division = division;
+        this.corner = corner;
+        this.activated = activated;
         this.food = (food==null)?new ArrayList<>() : new ArrayList<>(food);
     }
 }
