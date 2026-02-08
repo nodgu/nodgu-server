@@ -16,13 +16,22 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final DeviceRepository deviceRepository;
+    private final io.github.nodgu.core_server.domain.user.repository.PasswordResetTokenRepository passwordResetTokenRepository;
+    private final io.github.nodgu.core_server.global.service.EmailService emailService;
+
+    @org.springframework.beans.factory.annotation.Value("${app.auth.password-reset.expiration-ms:86400000}")
+    private long passwordResetExpirationMs;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-            DeviceRepository deviceRepository) {
+            DeviceRepository deviceRepository,
+            io.github.nodgu.core_server.domain.user.repository.PasswordResetTokenRepository passwordResetTokenRepository,
+            io.github.nodgu.core_server.global.service.EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.deviceRepository = deviceRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.emailService = emailService;
     }
 
     public User createUser(String email, String password, String nickname) {
@@ -82,5 +91,40 @@ public class UserService {
 
     public void unregisterDevice(User user, String fcmToken) {
         deviceRepository.deleteByUserAndFcmToken(user, fcmToken);
+    }
+
+    public void requestPasswordReset(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다: " + email));
+
+        String token = java.util.UUID.randomUUID().toString();
+
+        io.github.nodgu.core_server.domain.user.entity.PasswordResetToken resetToken = passwordResetTokenRepository
+                .findByUser(user)
+                .orElse(new io.github.nodgu.core_server.domain.user.entity.PasswordResetToken());
+
+        resetToken.setUser(user);
+        resetToken.setToken(token);
+        resetToken.setExpiryDate(java.time.LocalDateTime.now().plusNanos(passwordResetExpirationMs * 1000000L));
+
+        passwordResetTokenRepository.save(resetToken);
+
+        emailService.sendPasswordResetEmail(user.getEmail(), token);
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        io.github.nodgu.core_server.domain.user.entity.PasswordResetToken resetToken = passwordResetTokenRepository
+                .findByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 토큰입니다"));
+
+        if (resetToken.isExpired()) {
+            throw new IllegalArgumentException("만료된 토큰입니다");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        passwordResetTokenRepository.delete(resetToken);
     }
 }
