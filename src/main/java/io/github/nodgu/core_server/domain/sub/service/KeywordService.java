@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class KeywordService {
-    
+
     private final KeywordRepository keywordRepository;
 
     public KeywordService(KeywordRepository keywordRepository) {
@@ -29,6 +29,10 @@ public class KeywordService {
     }
 
     public void createKeyword(Long userId, KeywordRequest request) {
+        long currentCount = keywordRepository.countByUser_Id(userId);
+        if (currentCount >= 10) {
+            throw new IllegalStateException("키워드는 최대 10개까지 추가할 수 있습니다");
+        }
         if (keywordRepository.existsByUser_IdAndTitle(userId, request.getTitle())) {
             throw new IllegalArgumentException("이미 존재하는 키워드입니다");
         }

@@ -1,7 +1,6 @@
 package io.github.nodgu.core_server.domain.sub.controller;
 
 import lombok.RequiredArgsConstructor;
-import io.github.nodgu.core_server.domain.sub.entity.Scrap;
 import io.github.nodgu.core_server.domain.sub.dto.ScrapRequest;
 import io.github.nodgu.core_server.domain.sub.dto.ScrapListResponse;
 import io.github.nodgu.core_server.domain.notice.dto.NoticeListResponse.NoticeDto;
@@ -34,11 +33,17 @@ public class ScrapApiController {
 
     @PostMapping("/myScrap")
     public ResponseEntity<ApiResponse<Void>> addScrap(@RequestBody ScrapRequest request, @CurrentUser User user) {
-        Scrap savedScrap = scrapService.addScrap(request, user);
-
-        // 생성된 스크랩 정보를 응답 객체에 담아 전송 (HTTP 상태 코드 201 Created)
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("스크랩 추가 성공", null));
+        try {
+            scrapService.addScrap(request, user);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.success("스크랩 추가 성공", null));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage(), 400));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("스크랩 추가 실패: " + e.getMessage(), 500));
+        }
     }
 
     @DeleteMapping("/myScrap/{noticeId}")

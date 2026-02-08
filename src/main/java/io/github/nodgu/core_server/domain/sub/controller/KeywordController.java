@@ -18,17 +18,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/sub")
 public class KeywordController {
-    
+
     private final KeywordService keywordService;
     private final JwtUtil jwtUtil;
 
     @Autowired
-    public KeywordController (KeywordService keywordService, JwtUtil jwtUtil){
+    public KeywordController(KeywordService keywordService, JwtUtil jwtUtil) {
         this.keywordService = keywordService;
         this.jwtUtil = jwtUtil;
     }
 
-     private Long getUserIdFromRequest(HttpServletRequest request) {
+    private Long getUserIdFromRequest(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return null;
@@ -59,7 +59,7 @@ public class KeywordController {
 
     @PostMapping("/myKeyword")
     public ResponseEntity<ApiResponse<String>> createKeyword(@Valid @RequestBody KeywordRequest keywordRequest,
-                                                             HttpServletRequest request) {
+            HttpServletRequest request) {
         Long userId = getUserIdFromRequest(request);
         if (userId == null) {
             return ResponseEntity.status(401)
@@ -69,6 +69,9 @@ public class KeywordController {
         try {
             keywordService.createKeyword(userId, keywordRequest);
             return ResponseEntity.ok(ApiResponse.success("키워드가 성공적으로 추가되었습니다"));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.status(400)
+                    .body(ApiResponse.error(e.getMessage(), 400));
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(ApiResponse.error("키워드 추가에 실패했습니다: " + e.getMessage(), 500));
@@ -77,8 +80,8 @@ public class KeywordController {
 
     @PatchMapping("/myKeyword/{id}")
     public ResponseEntity<ApiResponse<String>> updateKeyword(@PathVariable Long id,
-                                                             @Valid @RequestBody KeywordRequest keywordRequest,
-                                                             HttpServletRequest request) {
+            @Valid @RequestBody KeywordRequest keywordRequest,
+            HttpServletRequest request) {
         Long userId = getUserIdFromRequest(request);
         if (userId == null) {
             return ResponseEntity.status(401)
@@ -96,7 +99,7 @@ public class KeywordController {
 
     @DeleteMapping("/myKeyword/{id}")
     public ResponseEntity<ApiResponse<String>> deleteKeyword(@PathVariable Long id,
-                                                             HttpServletRequest request) {
+            HttpServletRequest request) {
         Long userId = getUserIdFromRequest(request);
         if (userId == null) {
             return ResponseEntity.status(401)
