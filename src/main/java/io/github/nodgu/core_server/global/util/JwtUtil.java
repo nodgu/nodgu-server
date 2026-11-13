@@ -66,6 +66,23 @@ public class JwtUtil {
         return extractAllClaims(token).get("userId", Long.class);
     }
     
+    /**
+     * 비밀번호를 재설정하기 전에 발급된 토큰인지 확인한다.
+     * JWT의 iat는 초 단위라 초 단위로 비교한다.
+     */
+    public boolean isIssuedBeforePasswordChange(String token, User user) {
+        java.time.LocalDateTime changedAt = user.getPasswordChangedAt();
+        if (changedAt == null) {
+            return false;
+        }
+        Date issuedAt = extractAllClaims(token).getIssuedAt();
+        if (issuedAt == null) {
+            return true;
+        }
+        long changedAtSeconds = changedAt.atZone(java.time.ZoneId.systemDefault()).toEpochSecond();
+        return issuedAt.getTime() / 1000 < changedAtSeconds;
+    }
+
     public Date extractExpiration(String token) {
         return extractAllClaims(token).getExpiration();
     }

@@ -22,7 +22,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,6 +52,7 @@ class UserServiceTest {
     void setUp() {
         // Set default expiration to 24 hours (86400000 ms)
         ReflectionTestUtils.setField(userService, "passwordResetExpirationMs", 86400000L);
+        ReflectionTestUtils.setField(userService, "passwordResetResendCooldownSeconds", 300L);
     }
 
     @Test
@@ -96,7 +99,70 @@ class UserServiceTest {
 
         // Then
         assertEquals(encodedPassword, user.getPassword());
+        assertNotNull(user.getPasswordChangedAt());
         verify(userRepository).save(user);
         verify(passwordResetTokenRepository).delete(resetToken);
+    }
+
+    @Test
+    @DisplayName("가입되지 않은 이메일이면 예외 없이 아무것도 하지 않는다")
+    void requestPasswordReset_UnknownEmail_DoesNothing() {
+        when(userRepository.findByEmail("none@example.com")).thenReturn(Optional.empty());
+
+        assertDoesNotThrow(() -> userService.requestPasswordReset("none@example.com"));
+
+        verify(passwordResetTokenRepository, never()).save(any());
+        verify(emailService, never()).sendPasswordResetEmail(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("이용 정지 계정에는 재설정 메일을 보내지 않는다")
+    void requestPasswordReset_InactiveUser_DoesNothing() {
+        User user = new User();
+        user.setEmail("blocked@example.com");
+        user.setIsActive(false);
+        when(userRepository.findByEmail("blocked@example.com")).thenReturn(Optional.of(user));
+
+        userService.requestPasswordReset("blocked@example.com");
+
+        verify(emailService, never()).sendPasswordResetEmail(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("재요청 대기 시간 안에 다시 요청하면 메일을 보내지 않는다")
+    void requestPasswordReset_WithinCooldown_DoesNotResend() {
+        User user = new User();
+        user.setEmail("test@example.com");
+        PasswordResetToken existing = new PasswordResetToken();
+        existing.setUser(user);
+        existing.setToken("old");
+        // 1분 전에 발급된 토큰 (만료 = 발급 + 24시간)
+        existing.setExpiryDate(LocalDateTime.now().minusMinutes(1).plusHours(24));
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(passwordResetTokenRepository.findByUser(user)).thenReturn(Optional.of(existing));
+
+        userService.requestPasswordReset("test@example.com");
+
+        assertEquals("old", existing.getToken());
+        verify(emailService, never()).sendPasswordResetEmail(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("재요청 대기 시간이 지나면 새 토큰으로 다시 보낸다")
+    void requestPasswordReset_AfterCooldown_Resends() {
+        User user = new User();
+        user.setEmail("test@example.com");
+        PasswordResetToken existing = new PasswordResetToken();
+        existing.setUser(user);
+        existing.setToken("old");
+        // 10분 전에 발급된 토큰
+        existing.setExpiryDate(LocalDateTime.now().minusMinutes(10).plusHours(24));
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(passwordResetTokenRepository.findByUser(user)).thenReturn(Optional.of(existing));
+
+        userService.requestPasswordReset("test@example.com");
+
+        assertNotEquals("old", existing.getToken());
+        verify(emailService).sendPasswordResetEmail(eq("test@example.com"), eq(existing.getToken()));
     }
 }
