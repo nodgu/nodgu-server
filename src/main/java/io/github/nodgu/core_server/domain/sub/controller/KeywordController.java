@@ -4,13 +4,15 @@ import io.github.nodgu.core_server.domain.sub.dto.KeywordRequest;
 import io.github.nodgu.core_server.domain.sub.dto.KeywordListResponse;
 import io.github.nodgu.core_server.domain.sub.service.KeywordService;
 import io.github.nodgu.core_server.global.dto.ApiResponse;
-import io.github.nodgu.core_server.global.util.JwtUtil;
+import io.github.nodgu.core_server.domain.user.entity.User;
 
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,24 +22,18 @@ import java.util.List;
 public class KeywordController {
 
     private final KeywordService keywordService;
-    private final JwtUtil jwtUtil;
-
     @Autowired
-    public KeywordController(KeywordService keywordService, JwtUtil jwtUtil) {
+    public KeywordController(KeywordService keywordService) {
         this.keywordService = keywordService;
-        this.jwtUtil = jwtUtil;
     }
 
     private Long getUserIdFromRequest(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
+        // JwtAuthenticationFilter가 DB에서 확인한 사용자만 인정 (탈퇴한 계정의 토큰은 거부)
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User user) {
+            return user.getId();
         }
-        String token = authHeader.substring(7);
-        if (!jwtUtil.validateToken(token)) {
-            return null;
-        }
-        return jwtUtil.extractUserId(token);
+        return null;
     }
 
     @GetMapping("/myKeyword")
