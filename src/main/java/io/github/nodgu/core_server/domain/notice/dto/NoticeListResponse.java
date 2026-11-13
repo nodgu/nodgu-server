@@ -39,8 +39,9 @@ public class NoticeListResponse {
         private String notitype;
         private LocalDateTime date;
         private List<String> keywords;
+        private List<String> imgs; // 썸네일용 이미지 URL 목록 (없으면 빈 배열)
 
-        public NoticeDto(Long id, String noticeId, String title, String description, String url, String notitype, LocalDateTime date, List<String> keywords) {
+        public NoticeDto(Long id, String noticeId, String title, String description, String url, String notitype, LocalDateTime date, List<String> keywords, List<String> imgs) {
             this.id = id;
             this.noticeId = noticeId;
             this.title = title;
@@ -49,6 +50,7 @@ public class NoticeListResponse {
             this.notitype = notitype;
             this.date = date;
             this.keywords = keywords;
+            this.imgs = imgs;
         }
 
         public static NoticeDto from(Notice notice) {
@@ -64,7 +66,8 @@ public class NoticeListResponse {
                 notice.getUrl(),
                 notice.getNotitype(),
                 notice.getDate(),
-                keywordNames
+                keywordNames,
+                notice.getImgs() != null ? notice.getImgs() : List.of()
             );
         }
 
@@ -76,6 +79,7 @@ public class NoticeListResponse {
         public String getNotitype() { return notitype; }
         public LocalDateTime getDate() { return date; }
         public List<String> getKeywords() { return keywords; }
+        public List<String> getImgs() { return imgs; }
     }
 
     public static NoticeListResponse from(List<Notice> notices, long totalCount, int currentPage) {
