@@ -59,13 +59,18 @@ public class NotificationService {
 
         Notification saved = notificationRepository.save(new_notification);
 
+        // 공지와 연결된 알림이면 앱이 알림을 눌렀을 때 그 공지를 열 수 있도록 공지 ID를 함께 보낸다
+        java.util.Map<String, String> data = saved.getNotice() != null
+                ? java.util.Map.of("type", "notice", "notice_id", String.valueOf(saved.getNotice().getId()))
+                : java.util.Map.of();
+
         // 사용자가 등록한 모든 기기로 푸시 전송 (같은 토큰은 한 번만, 기기가 없으면 기록만 저장)
         deviceRepository.findAllByUser(user).stream()
                 .map(Device::getFcmToken)
                 .filter(token -> token != null && !token.isBlank())
                 .distinct()
                 .forEach(token -> fcmPushService.sendPushNotification(token, saved.getTitle(),
-                        saved.getDescription()));
+                        saved.getDescription(), data));
 
         return saved;
     }

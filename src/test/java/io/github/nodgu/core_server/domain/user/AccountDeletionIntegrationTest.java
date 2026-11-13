@@ -36,6 +36,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -123,8 +124,8 @@ class AccountDeletionIntegrationTest {
         passwordResetTokenRepository.save(resetToken);
 
         // 탈퇴 전에는 키워드 알림 푸시가 실제로 나간다 (테스트 경로 확인)
-        schedule.sendKeywordNoticeSchedule();
-        verify(fcmPushService, atLeastOnce()).sendPushNotification(eq("fcm-" + userId), anyString(), anyString());
+        schedule.sendKeywordNotificationsFor(notice.getDate().toLocalDate());
+        verify(fcmPushService, atLeastOnce()).sendPushNotification(eq("fcm-" + userId), anyString(), anyString(), anyMap());
 
         // 비밀번호가 틀리면 탈퇴되지 않는다
         mockMvc.perform(post("/api/v1/auth/quit")
@@ -171,8 +172,8 @@ class AccountDeletionIntegrationTest {
 
         // 탈퇴한 사람 기기로 키워드 알림 푸시가 더 이상 나가지 않는다
         reset(fcmPushService);
-        schedule.sendKeywordNoticeSchedule();
-        verify(fcmPushService, never()).sendPushNotification(eq("fcm-" + userId), anyString(), anyString());
+        schedule.sendKeywordNotificationsFor(notice.getDate().toLocalDate());
+        verify(fcmPushService, never()).sendPushNotification(eq("fcm-" + userId), anyString(), anyString(), anyMap());
 
         // 같은 이메일로 다시 가입 가능
         register(email);
