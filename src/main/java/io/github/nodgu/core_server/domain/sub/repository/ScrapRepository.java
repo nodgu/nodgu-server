@@ -1,5 +1,9 @@
 package io.github.nodgu.core_server.domain.sub.repository;
 
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import io.github.nodgu.core_server.domain.sub.entity.Scrap;
 import io.github.nodgu.core_server.domain.notice.entity.Notice;
 import io.github.nodgu.core_server.domain.user.entity.User;
@@ -15,4 +19,8 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
     Optional<Scrap> findByUserAndNotice(User user, Notice notice);
 
     long countByUser(User user);
+
+    @Modifying
+    @Query("delete from Scrap e where e.user.id = :userId")
+    int deleteAllByUserId(@Param("userId") Long userId);
 }

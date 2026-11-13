@@ -44,7 +44,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 User user = userService.findByEmail(userEmail);
                 
-                if (jwtUtil.validateToken(jwt)) {
+                // 탈퇴 후 같은 이메일로 재가입한 계정을 예전 토큰으로 쓰지 못하게 userId까지 확인하고,
+                // 이용 정지(isActive=false) 계정은 인증하지 않는다
+                if (jwtUtil.validateToken(jwt)
+                        && user.getId().equals(jwtUtil.extractUserId(jwt))
+                        && Boolean.TRUE.equals(user.getIsActive())) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         user, null, null);
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

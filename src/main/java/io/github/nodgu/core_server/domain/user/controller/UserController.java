@@ -10,7 +10,7 @@ import io.github.nodgu.core_server.domain.user.dto.PasswordResetRequest;
 import io.github.nodgu.core_server.domain.user.dto.PasswordResetConfirmRequest;
 import io.github.nodgu.core_server.domain.user.entity.Device;
 import io.github.nodgu.core_server.domain.user.entity.User;
-import io.github.nodgu.core_server.domain.user.repository.UserRepository;
+import io.github.nodgu.core_server.domain.user.service.AccountDeletionService;
 import io.github.nodgu.core_server.domain.user.service.UserService;
 import io.github.nodgu.core_server.global.annotation.CurrentUser;
 import io.github.nodgu.core_server.global.dto.ApiResponse;
@@ -27,13 +27,13 @@ public class UserController {
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
+    private final AccountDeletionService accountDeletionService;
 
     @Autowired
-    public UserController(UserService userService, JwtUtil jwtUtil, UserRepository userRepository) {
+    public UserController(UserService userService, JwtUtil jwtUtil, AccountDeletionService accountDeletionService) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
+        this.accountDeletionService = accountDeletionService;
     }
 
     @PostMapping("/login")
@@ -45,6 +45,12 @@ public class UserController {
             if (!userService.validatePassword(loginRequest.getPassword(), user.getPassword())) {
                 return ResponseEntity.badRequest()
                         .body(ApiResponse.error("이메일 또는 비밀번호가 올바르지 않습니다", 401));
+            }
+
+            // 이용 정지된 계정은 로그인 불가 (isActive는 탈퇴가 아닌 정지 용도)
+            if (!Boolean.TRUE.equals(user.getIsActive())) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("이용이 제한된 계정입니다", 403));
             }
 
             // 실제 JWT 토큰 생성
@@ -103,6 +109,13 @@ public class UserController {
             String userEmail = jwtUtil.extractEmail(refreshToken);
             User user = userService.findByEmail(userEmail);
 
+            // 탈퇴 후 같은 이메일로 재가입한 계정을 예전 토큰으로 갱신하지 못하게 userId까지 확인
+            if (!user.getId().equals(jwtUtil.extractUserId(refreshToken))
+                    || !Boolean.TRUE.equals(user.getIsActive())) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("유효하지 않은 토큰입니다", 401));
+            }
+
             // 새로운 토큰 생성
             String newAccessToken = jwtUtil.generateAccessToken(user);
             String newRefreshToken = jwtUtil.generateRefreshToken(user);
@@ -155,9 +168,8 @@ public class UserController {
                     .body(ApiResponse.error("비밀번호가 올바르지 않습니다", 400));
         }
 
-        // 실제로는 isActive를 false로 변경하여 soft delete 처리
-        user.setIsActive(false);
-        userRepository.save(user);
+        // 계정과 스크랩·키워드·알림 설정·FCM 토큰 등 관련 데이터를 한 트랜잭션으로 실제 삭제
+        accountDeletionService.deleteAccount(user.getId());
 
         return ResponseEntity.ok(ApiResponse.success("회원 탈퇴가 완료되었습니다", null, 200));
     }
