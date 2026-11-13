@@ -57,13 +57,17 @@ public class NotificationService {
                 .remindDate(request.getRemindDate())
                 .build();
 
-        // 알림 설정에 따라 푸시 알림 전송
-        Device device = deviceRepository.findByUser(user)
-                .orElseThrow(() -> new IllegalArgumentException("Device를 찾을 수 없습니다."));
-        fcmPushService.sendPushNotification(device.getFcmToken(), new_notification.getTitle(),
-                new_notification.getDescription());
+        Notification saved = notificationRepository.save(new_notification);
 
-        return notificationRepository.save(new_notification);
+        // 사용자가 등록한 모든 기기로 푸시 전송 (같은 토큰은 한 번만, 기기가 없으면 기록만 저장)
+        deviceRepository.findAllByUser(user).stream()
+                .map(Device::getFcmToken)
+                .filter(token -> token != null && !token.isBlank())
+                .distinct()
+                .forEach(token -> fcmPushService.sendPushNotification(token, saved.getTitle(),
+                        saved.getDescription()));
+
+        return saved;
     }
 
     public Notification findById(Long id) {
