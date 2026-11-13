@@ -89,8 +89,13 @@ public class UserService {
     }
 
     public Device registerDevice(User user, String fcmToken) {
-        Device device = new Device(user, fcmToken);
-        return deviceRepository.save(device);
+        // 한 기기에서 다른 계정으로 로그인했다면 이전 계정과의 연결을 끊는다
+        deviceRepository.deleteByFcmTokenAndOtherUser(fcmToken, user.getId());
+        // 같은 기기를 다시 등록하면 중복 행을 만들지 않는다 (중복 푸시 방지)
+        return deviceRepository.findAllByUser(user).stream()
+                .filter(d -> fcmToken.equals(d.getFcmToken()))
+                .findFirst()
+                .orElseGet(() -> deviceRepository.save(new Device(user, fcmToken)));
     }
 
     public void unregisterDevice(User user, String fcmToken) {

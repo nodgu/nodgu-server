@@ -20,6 +20,8 @@ public class NotificationListResponse {
         this.notice = notification.getNotice();
         this.title = notification.getTitle();
         this.description = notification.getDescription();
-        this.notificationSettingId = notification.getNotificationSetting().getId();
+        this.notificationSettingId = notification.getNotificationSetting() != null
+                ? notification.getNotificationSetting().getId()
+                : null;
     }
 }
