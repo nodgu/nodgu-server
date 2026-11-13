@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -53,7 +54,7 @@ class SendNotificationIntegrationTest {
             assertEquals(401, send(post(path).header("X-API-Key", "wrong-key"), user.getId()).getResponse().getStatus());
         }
 
-        verify(fcmPushService, never()).sendPushNotification(anyString(), anyString(), anyString());
+        verify(fcmPushService, never()).sendPushNotification(anyString(), anyString(), anyString(), anyMap());
         assertEquals(before, notificationRepository.count());
     }
 
@@ -73,8 +74,8 @@ class SendNotificationIntegrationTest {
             JsonNode body = objectMapper.readTree(result.getResponse().getContentAsString());
             assertTrue(body.path("success").asBoolean());
 
-            verify(fcmPushService, times(1)).sendPushNotification(eq("token-phone-" + user.getId()), eq("제목"), eq("내용"));
-            verify(fcmPushService, times(1)).sendPushNotification(eq("token-tablet-" + user.getId()), eq("제목"), eq("내용"));
+            verify(fcmPushService, times(1)).sendPushNotification(eq("token-phone-" + user.getId()), eq("제목"), eq("내용"), eq(java.util.Map.of()));
+            verify(fcmPushService, times(1)).sendPushNotification(eq("token-tablet-" + user.getId()), eq("제목"), eq("내용"), eq(java.util.Map.of()));
             verifyNoMoreInteractions(fcmPushService);
         }
     }
@@ -93,7 +94,7 @@ class SendNotificationIntegrationTest {
 
         assertEquals(201, send(post("/api/v1/notification/sendNotification").header("X-API-Key", "test-api-key"),
                 oldUser.getId()).getResponse().getStatus());
-        verify(fcmPushService, never()).sendPushNotification(eq(token), anyString(), anyString());
+        verify(fcmPushService, never()).sendPushNotification(eq(token), anyString(), anyString(), anyMap());
     }
 
     private MvcResult send(MockHttpServletRequestBuilder req, Long userId) throws Exception {
