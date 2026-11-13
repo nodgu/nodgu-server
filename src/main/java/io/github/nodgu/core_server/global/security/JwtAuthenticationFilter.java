@@ -45,9 +45,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 User user = userService.findByEmail(userEmail);
                 
                 // 탈퇴 후 같은 이메일로 재가입한 계정을 예전 토큰으로 쓰지 못하게 userId까지 확인하고,
-                // 이용 정지(isActive=false) 계정은 인증하지 않는다
+                // 이용 정지(isActive=false) 계정과 비밀번호 재설정 전에 발급된 토큰은 인증하지 않는다
                 if (jwtUtil.validateToken(jwt)
                         && user.getId().equals(jwtUtil.extractUserId(jwt))
+                        && !jwtUtil.isIssuedBeforePasswordChange(jwt, user)
                         && Boolean.TRUE.equals(user.getIsActive())) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         user, null, null);

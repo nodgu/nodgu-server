@@ -33,6 +33,10 @@ public class User {
     @Column(nullable = false)
     private Boolean isStaff = false;
     
+    // 비밀번호 재설정 시각. 이보다 먼저 발급된 JWT는 거부한다.
+    @Column(name = "password_changed_at")
+    private LocalDateTime passwordChangedAt;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
     

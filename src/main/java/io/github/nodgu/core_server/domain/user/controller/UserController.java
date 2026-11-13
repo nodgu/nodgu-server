@@ -17,6 +17,8 @@ import io.github.nodgu.core_server.global.dto.ApiResponse;
 import io.github.nodgu.core_server.global.util.JwtUtil;
 import jakarta.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/auth")
 public class UserController {
+
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
@@ -111,7 +115,8 @@ public class UserController {
 
             // 탈퇴 후 같은 이메일로 재가입한 계정을 예전 토큰으로 갱신하지 못하게 userId까지 확인
             if (!user.getId().equals(jwtUtil.extractUserId(refreshToken))
-                    || !Boolean.TRUE.equals(user.getIsActive())) {
+                    || !Boolean.TRUE.equals(user.getIsActive())
+                    || jwtUtil.isIssuedBeforePasswordChange(refreshToken, user)) {
                 return ResponseEntity.badRequest()
                         .body(ApiResponse.error("유효하지 않은 토큰입니다", 401));
             }
@@ -191,20 +196,14 @@ public class UserController {
 
     @PostMapping("/password/forgot")
     public ResponseEntity<ApiResponse<Void>> requestPasswordReset(@Valid @RequestBody PasswordResetRequest request) {
+        // 가입 여부가 드러나지 않도록 결과와 상관없이 항상 같은 성공 응답을 반환한다
         try {
             userService.requestPasswordReset(request.getEmail());
-            // 보안을 위해 항상 성공 응답을 반환 (이메일 존재 여부 노출 방지)
-            return ResponseEntity.ok(ApiResponse.success("비밀번호 재설정 이메일이 발송되었습니다", null, 200));
         } catch (Exception e) {
-            // 로깅이 필요하겠지만, 클라이언트에게는 성공 메시지 전달 권장.
-            // 여기서는 개발 편의를 위해 일단 성공으로 리턴하거나,
-            // 실무에서는 Rate Limiting 등을 걸고 모호한 에러를 뱉기도 함.
-            // 하지만 UserServiceImpl에서 사용자가 없으면 에러를 던지므로,
-            // 명확한 피드백을 원한다면 에러 메시지를 반환해도 됨.
-            // 현재 요구사항이 명확하지 않으므로 에러를 반환하겠습니다.
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("요청 처리 중 오류가 발생했습니다: " + e.getMessage(), 400));
+            log.error("비밀번호 재설정 메일 처리 실패", e);
         }
+        return ResponseEntity.ok(ApiResponse.success(
+                "가입된 이메일이라면 비밀번호 재설정 메일이 발송됩니다", null, 200));
     }
 
     @PostMapping("/password/reset")

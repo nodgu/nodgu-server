@@ -22,6 +22,10 @@ public class UserService {
     @org.springframework.beans.factory.annotation.Value("${app.auth.password-reset.expiration-ms:86400000}")
     private long passwordResetExpirationMs;
 
+    // 같은 계정으로 재설정 메일을 다시 보낼 수 있을 때까지의 최소 간격 (메일 폭탄 방지)
+    @org.springframework.beans.factory.annotation.Value("${app.auth.password-reset.resend-cooldown-seconds:300}")
+    private long passwordResetResendCooldownSeconds;
+
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
             DeviceRepository deviceRepository,
@@ -93,19 +97,35 @@ public class UserService {
         deviceRepository.deleteByUserAndFcmToken(user, fcmToken);
     }
 
+    /**
+     * 비밀번호 재설정 메일을 보낸다.
+     * 가입 여부를 드러내지 않도록 없는 이메일·이용 정지 계정·재요청 대기 중인 경우에는 아무것도 하지 않고 조용히 끝낸다.
+     */
     public void requestPasswordReset(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다: " + email));
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null || !Boolean.TRUE.equals(user.getIsActive())) {
+            return;
+        }
 
-        String token = java.util.UUID.randomUUID().toString();
-
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
         io.github.nodgu.core_server.domain.user.entity.PasswordResetToken resetToken = passwordResetTokenRepository
                 .findByUser(user)
                 .orElse(new io.github.nodgu.core_server.domain.user.entity.PasswordResetToken());
 
+        if (resetToken.getExpiryDate() != null) {
+            // 발급 시각 = 만료 시각 - 유효 기간
+            java.time.LocalDateTime issuedAt = resetToken.getExpiryDate()
+                    .minus(java.time.Duration.ofMillis(passwordResetExpirationMs));
+            if (issuedAt.isAfter(now.minusSeconds(passwordResetResendCooldownSeconds))) {
+                return; // 직전에 보낸 메일의 토큰이 아직 유효하므로 다시 보내지 않는다
+            }
+        }
+
+        String token = java.util.UUID.randomUUID().toString();
+
         resetToken.setUser(user);
         resetToken.setToken(token);
-        resetToken.setExpiryDate(java.time.LocalDateTime.now().plusNanos(passwordResetExpirationMs * 1000000L));
+        resetToken.setExpiryDate(now.plus(java.time.Duration.ofMillis(passwordResetExpirationMs)));
 
         passwordResetTokenRepository.save(resetToken);
 
@@ -123,6 +143,8 @@ public class UserService {
 
         User user = resetToken.getUser();
         user.setPassword(passwordEncoder.encode(newPassword));
+        // 이 시각 이전에 발급된 액세스·리프레시 토큰은 모두 무효가 된다
+        user.setPasswordChangedAt(java.time.LocalDateTime.now());
         userRepository.save(user);
 
         passwordResetTokenRepository.delete(resetToken);
